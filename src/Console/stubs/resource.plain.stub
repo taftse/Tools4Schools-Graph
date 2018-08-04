@@ -12,7 +12,7 @@ class DummyClass extends Resource
      *
      * @var string
      */
-    public static $title ='';
+    public static $title ='DummyClass';
 
     /**
      * Get the fields returned by the resource

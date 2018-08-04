@@ -1,17 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Timothy
- * Date: 31/07/2018
- * Time: 15:59
- */
 
 namespace Tools4Schools\Graph;
 
 
 use Illuminate\Http\Request;
+use Tools4Schools\Graph\Response\Response;
+use Illuminate\Validation\ValidationException;
+use Tools4Schools\Graph\Response\ResponseCollection;
 
-class Resource
+abstract class Resource 
 {
 	/**
 	 * The model the resource corresponds to.
@@ -27,6 +24,8 @@ class Resource
 	 */
 	public static $title ='name';
 
+    protected $response;
+
 
     /**
      * Get the fields returned by the resource
@@ -34,8 +33,13 @@ class Resource
      * @param Request $request
      * @return mixed
      */
-	public abstract  function fields(Request $request);
+	public abstract function fields(Request $request);
 
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+        //$this->response = new Response($this);
+    }//*/
 
     /**
      * Display a listing of the resource.
@@ -44,20 +48,9 @@ class Resource
      */
     public function index()
     {
-        //
-    }
-
-
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function get($id)
-    {
-        //
+        return $this->newQuery($this->getFields(true))->paginate();
+        // return new ResponseCollection($query->paginate());
+       //return $query->paginate();
     }
 
     /**
@@ -66,12 +59,37 @@ class Resource
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function post(Request $request)
+    public function store(Request $request)
     {
-        //
+        try{
+            $request->validate($this->getCreateValidator());
+        }
+        catch(ValidationException $e)
+        {
+            return response()->json([
+                    'error'=>[
+                        'message'=>$e->errors()
+                    ]
+                ],422);
+        }
+
+
+        $resource = $this->model($request->all());
+        $resource->save();
+
+       return  response()->json(['id'=>$resource->id],200);
     }
 
-
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        return $this->newQuery($this->getFields())->find($id);
+    }
 
     /**
      * Update the specified resource in storage.
@@ -80,9 +98,25 @@ class Resource
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function put(Request $request, $id)
+    public function update(Request $request, $id)
     {
-        //
+       try{
+            $request->validate($this->getUpdateValidator());
+        }
+        catch(ValidationException $e)
+        {
+            return response()->json([
+                    'error'=>[
+                        'message'=>$e->errors()
+                    ]
+                ],422);
+        }
+
+
+        $resource = $this->model()->find($id);
+        $resource->update($request->all());
+
+       return  response()->json(['id'=>$resource->id],200);
     }
 
     /**
@@ -91,8 +125,50 @@ class Resource
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function delete(Request $request,$id)
+    public function destroy($id)
     {
         //
+    }
+
+    protected function getFields($index = false)
+    {
+        $fields = [];
+        foreach ($this->fields($this->request) as $field) {
+            if($field->hideFromIndex != true)
+            {
+                $fields[] = $field->name();
+            }
+        }
+        return $fields;
+    }
+
+    protected function model(array $attributes = [])
+    {
+        return new static::$model($attributes);
+    }
+
+    protected function newQuery($fields = ['*'])
+    {
+        return $this->model()->select($fields);
+    }
+
+    public function getUpdateValidator()
+    {
+        $rules = [];
+        foreach ($this->fields($this->request) as $field) {
+            $rules = array_merge($rules,$field->getUpdateRules());
+        }
+        return $rules;
+
+    }
+
+    public function getCreateValidator()
+    {
+        $rules = [];
+        foreach ($this->fields($this->request) as $field) {
+            $rules = array_merge($rules,$field->getUpdateRules());
+        }
+        return $rules;
+
     }
 }

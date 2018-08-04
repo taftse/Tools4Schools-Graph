@@ -11,8 +11,8 @@ namespace Tools4Schools\Graph\Fields;
 
 class ID extends Field
 {
-    public function make()
+    public static function make($name = 'id')
     {
-        return parent::make('ID');
+        return parent::make($name);
     }
 }
