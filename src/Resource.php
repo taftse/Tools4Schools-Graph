@@ -130,6 +130,13 @@ abstract class Resource
         //
     }
 
+    /**
+     * Get the fields displayed by the resource
+     *
+     * @param bool $index
+     * @return array
+     */
+
     protected function getFields($index = false)
     {
         $fields = [];
