@@ -2,6 +2,8 @@
 
 namespace Tools4Schools\Graph;
 
+
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Tools4Schools\Graph\Console\ResourceMakeCommand;
 
@@ -14,8 +16,40 @@ class GraphServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->resourcesIn('app\Graph');
+
+        $this->registerRoutes();
+
+        //$this->resourcesIn('app\Graph');
     }
+
+
+    /**
+     * Register the package routes.
+     *
+     * @return void
+     */
+    protected function registerRoutes()
+    {
+        Route::group($this->routeConfiguration(), function () {
+            $this->loadRoutesFrom(__DIR__.'/../routes/graph.php');
+        });
+    }
+
+    /**
+     * Get the Nova route group configuration array.
+     *
+     * @return array
+     */
+    protected function routeConfiguration()
+    {
+        return [
+            'namespace' => 'Tools4Schools\Graph\Http\Controllers',
+            'as' => 'graph.api.',
+            'prefix' => 'graph-api',
+            'middleware' => 'graph',
+        ];
+    }
+
 
     /**
      * Register services.
@@ -24,8 +58,11 @@ class GraphServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerResourceMakeCommand();
-
+        //$this->registerResourceMakeCommand();
+        $this->commands([
+            Console\ResourceMakeCommand::class,
+            Console\FilterMakeCommand::class
+        ]);
 
     }
 
@@ -34,7 +71,7 @@ class GraphServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerResourceMakeCommand()
+    /*protected function registerResourceMakeCommand()
     {
         $this->app->singleton('command.graph.resource', function ($app) {
             return new ResourceMakeCommand($app['files']);
@@ -127,5 +164,5 @@ class GraphServiceProvider extends ServiceProvider
         //Build the fully-qualified class name and return it
         return $namespace ? $namespace . '\\' . $class : $class;
 
-    }
+    }*/
 }

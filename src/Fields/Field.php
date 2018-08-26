@@ -11,24 +11,44 @@ namespace Tools4Schools\Graph\Fields;
 class Field
 {
     /**
-     * Name of the field
+     * Display name of the field
      *
      * @var string
      */
-    protected $name;
+    protected $displayName;
 
+    /**
+     * Field name
+     *
+     * @var string
+     */
+    protected $fieldName;
+
+    /**
+     * Should this field be hidden from the index request
+     *
+     * @var bool
+     */
     public $hideFromIndex = false;
 
+    /**
+     * The creation and update Rules
+     *
+     * @var array
+     */
     protected $rules = ['creation'=>[],'update'=>[]];
 
-    public function __construct($name)
+
+
+    public function __construct($displayName,$fieldName,Closure $format)
     {
-        $this->name = $name;
+        $this->displayName = $displayName;
+        $this->fieldName = $fieldName;
     }
 
-    public static function make($name = '')
+    public static function make($displayName = '',$fieldName,Closure $format)
     {
-        return new self($name);
+        return new self($displayName,$fieldName,$format);
     }
 
     public function name()
@@ -99,6 +119,11 @@ class Field
     public function hideFromIndex()
     {
         $this->hideFromIndex = true;
+        return $this;
+    }
+
+    public function searchable()
+    {
         return $this;
     }
 }

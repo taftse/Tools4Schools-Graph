@@ -30,11 +30,7 @@ class ResourceMakeCommand extends GeneratorCommand
      */
     protected $type = 'Resource';
 
-    /**
-     * Get the stub file for the generator.
-     *
-     * @return string
-     */
+
     /**
      * Get the stub file for the generator.
      *
