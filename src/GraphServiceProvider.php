@@ -24,7 +24,7 @@ class GraphServiceProvider extends ServiceProvider
 
         $this->registerRoutes();
 
-        //$this->resourcesIn('app\Graph');
+        Graph::resourcesIn(app_path('Graph'));
     }
 
 

@@ -8,6 +8,7 @@
 
 namespace Tools4Schools\Graph\Http\Requests;
 
+use Tools4Schools\Graph\Graph;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -34,4 +35,20 @@ class GraphRequest extends FormRequest
             //
         ];
     }
+
+    public function resource()
+    {
+        return tap(Graph::resourceForKey($this->resource),function($resource){
+            abort_if(is_null($resource),404);
+            abort_if(!$resource::authorizedToViewAny($this),403);
+        });
+    }
+
+
+    public function model(){
+        $resourcec = $this->resource();
+
+        return $resourcec::newModel();
+    }
+
 }

@@ -8,6 +8,7 @@
 
 namespace Tools4Schools\Graph\Http\Controllers;
 
+use Tools4Schools\Graph\Graph;
 use Illuminate\Routing\Controller;
 use Tools4Schools\Graph\Http\Requests\ResourceIndexRequest;
 
@@ -16,5 +17,14 @@ class ResourceIndexController extends Controller
     public function handle(ResourceIndexRequest $request)
     {
 
+        $paginator = $this->paginator(
+            $request, $resource = $request->resource()
+        );
+    }
+
+
+    protected function paginator(ResourceIndexRequest $request,$resource)
+    {
+        dd($request);
     }
 }

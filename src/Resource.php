@@ -3,27 +3,44 @@
 namespace Tools4Schools\Graph;
 
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Tools4Schools\Graph\Response\Response;
 use Illuminate\Validation\ValidationException;
-use Tools4Schools\Graph\Response\ResponseCollection;
-use Illuminate\Http\Resources\Json\JsonResource;
+
 
 abstract class Resource //extends JsonResource
 {
+    use Authorizable;
+
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = '';
+    public $model;
 
     /**
      * The single value that should be used to represent the resource when being displayed
      *
      * @var string
      */
-    public static $title = 'name';
+    public static $title = 'id';
+
+
+    /**
+     * The relationships that should be eager loaded when preforming an index query
+     *
+     * @var array
+     */
+     public static $with = [];
+
+    /**
+     * The columns that should be searched.
+     *
+     * @var array
+     */
+    public static $search = [];
+
 
     /**
      * Indicates if the resource should be globally searchable
@@ -34,29 +51,15 @@ abstract class Resource //extends JsonResource
     public static $globallySearchable = false;
 
     /**
-     * The relationships that should be eager loaded when preforming an index query
+     * Create a new resource instance.
      *
-     * @var array
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return void
      */
-  //  public static $with = [];
-
-
-    /**
-     * Get the search result subtitle for the resource
-     *
-     * @return string
-     */
-    public function subtitle(){
-        return '';
+    public function __construct($model)
+    {
+        $this->model = $model;
     }
-
-
-    public static $search = [
-        'id',
-    ];
-
-    protected $response;
-
 
     /**
      * Get the fields returned by the resource
@@ -65,6 +68,77 @@ abstract class Resource //extends JsonResource
      * @return mixed
      */
     public abstract function fields(Request $request);
+
+
+
+    /**
+     * Get the underlying model instance for the resource.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function model()
+    {
+        return $this->model;
+    }
+
+
+    /**
+     * Get the value that should be displayed to represent the resource.
+     *
+     * @return string
+     */
+    public function title()
+    {
+        return $this->{static::$title};
+    }
+
+    /**
+     * Get the search result subtitle for the resource.
+     *
+     * @return string
+     */
+    public function subtitle()
+    {
+        return null;
+    }
+
+    /**
+     * Get a fresh instance of the model represented by the resource.
+     *
+     * @return mixed
+     */
+    public static function newModel()
+    {
+        $model = static::$model;
+
+        return new $model;
+    }
+
+    /**
+     * Get the URI key for the resource.
+     *
+     * @return string
+     */
+    public static function uriKey()
+    {
+        return Str::plural(Str::snake(class_basename(get_called_class()), '-'));
+    }
+
+
+
+
+
+
+
+
+
+
+    //---------------------------------------------------------------------------------------------------
+
+    protected $response;
+
+
+
 
 
     /**
@@ -78,12 +152,6 @@ abstract class Resource //extends JsonResource
         return [];
     }
 
-
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-        //$this->response = new Response($this);
-    }//*/
 
     /**
      * Display a listing of the resource.
@@ -188,10 +256,7 @@ abstract class Resource //extends JsonResource
         return $fields;
     }
 
-    protected function model(array $attributes = [])
-    {
-        return new static::$model($attributes);
-    }
+
 
     protected function newQuery($fields = ['*'])
     {

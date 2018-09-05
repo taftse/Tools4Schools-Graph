@@ -8,7 +8,8 @@
 
 namespace Tools4Schools\Graph;
 
-
+use ReflectionClass;
+use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
 
 class Graph
@@ -51,24 +52,40 @@ class Graph
      * @param $directory
      * @return void
      */
-    public static function resourceIn($directory)
+    public static function resourcesIn($directory)
     {
         $namespace = app()->getNamespace();
 
         $resources = [];
 
-        foreach ((New Finder)->in($directory)->files() as $resource){
+        foreach ((new Finder)->in($directory)->files() as $resource) {
             $resource = $namespace.str_replace(
-                ['/','.php'],
-                ['\\',''],
-                Str::after($resource->getPathname(),app_path().DIRECTORY_SEPARATOR)
+                    ['/', '.php'],
+                    ['\\', ''],
+                    Str::after($resource->getPathname(), app_path().DIRECTORY_SEPARATOR)
                 );
-            if(is_subclass_of($resource,Resource::class) && !(new ReflectionClass($resource))->isAbstract())
-            {
+
+            if (is_subclass_of($resource, Resource::class) &&
+                ! (new ReflectionClass($resource))->isAbstract()) {
                 $resources[] = $resource;
             }
         }
 
-        static::resources(collect($resources)->sort()->all());
+        static::resources(
+            collect($resources)->sort()->all()
+        );
+    }
+
+    /**
+     * Get the resource class name for a given key
+     *
+     * @param $key
+     * @return mixed
+     */
+    public static function resourceForKey($key)
+    {
+        return collect(static::$resources)->first(function ($value) use ($key) {
+            return $value::uriKey() === $key;
+        });
     }
 }
