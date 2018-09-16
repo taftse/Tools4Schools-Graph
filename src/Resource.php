@@ -3,6 +3,7 @@
 namespace Tools4Schools\Graph;
 
 
+use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -10,14 +11,19 @@ use Illuminate\Validation\ValidationException;
 
 abstract class Resource //extends JsonResource
 {
-    use Authorizable;
+    use Authorizable,
+        ConditionallyLoadsAttributes,
+    //    FillsFields,
+    //    PreformsValidation,
+        PreformsQueries;
+    //    ResolvesFields;
 
     /**
-     * The model the resource corresponds to.
+     * The underlying model resource instance.
      *
-     * @var string
+     * @var \Illuminate\Database\Eloquent\Model
      */
-    public $model;
+    public $resource;
 
     /**
      * The single value that should be used to represent the resource when being displayed
@@ -53,12 +59,12 @@ abstract class Resource //extends JsonResource
     /**
      * Create a new resource instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model  $resource
      * @return void
      */
-    public function __construct($model)
+    public function __construct($resource)
     {
-        $this->model = $model;
+        $this->resource = $resource;
     }
 
     /**
@@ -78,7 +84,7 @@ abstract class Resource //extends JsonResource
      */
     public function model()
     {
-        return $this->model;
+        return $this->resource;
     }
 
 

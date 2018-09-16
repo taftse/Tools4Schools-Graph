@@ -25,6 +25,6 @@ class ResourceIndexController extends Controller
 
     protected function paginator(ResourceIndexRequest $request,$resource)
     {
-        dd($request);
+        dd($request->toQuery());
     }
 }
