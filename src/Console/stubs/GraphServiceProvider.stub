@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class GraphServiceProvider extends ServiceProvider
+class GraphServiceProvider extends GraphApplicationServiceProvider
 {
     /**
      * Bootstrap any application services.
@@ -15,5 +15,9 @@ class GraphServiceProvider extends ServiceProvider
     {
         parent::boot();
     }
+
+    /*protected function routes(){
+
+    }*/
 
 }
