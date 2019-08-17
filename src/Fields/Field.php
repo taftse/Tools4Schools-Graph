@@ -56,10 +56,6 @@ class Field
         return $this->name;
     }
 
-    public function sortable()
-    {
-        return $this;
-    }
 
     public function rules(...$rules)
     {
