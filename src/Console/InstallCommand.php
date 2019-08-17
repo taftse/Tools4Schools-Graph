@@ -32,6 +32,8 @@ class InstallCommand extends Command
 
         $this->registerGraphServiceProvider();
 
+        $this->comment('Generating User Resource...');
+        $this->callSilent('graph:resource',['name','User']);
 
     }
 

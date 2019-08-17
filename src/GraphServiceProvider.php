@@ -22,9 +22,9 @@ class GraphServiceProvider extends ServiceProvider
         ], 'graph-provider');
 
 
-        $this->registerRoutes();
+      //  $this->registerRoutes();
 
-        Graph::resourcesIn(app_path('Graph'));
+        //Graph::resourcesIn(app_path('Graph'));
     }
 
 

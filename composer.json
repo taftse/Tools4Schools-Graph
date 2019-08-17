@@ -30,7 +30,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Tools4Schools\\Graph\\GraphServiceProvider"
+        "Tools4Schools\\Graph\\GraphCoreServiceProvider"
       ]
     }
   },
