@@ -33,13 +33,23 @@ class Graph
     }
 
 
-    /**
+
+    public static function path(){
+        return config('graph.path','/graph');
+    }
+
+
+
+
+
+
+  /*  /**
      * Register the given reources
      *
      * @param array $resources
      * @return Graph
      */
-    public static function resources(array $resources)
+  /*  public static function resources(array $resources)
     {
         static::$resources = array_merge(static::$resources,$resources);
 
@@ -52,7 +62,7 @@ class Graph
      * @param $directory
      * @return void
      */
-    public static function resourcesIn($directory)
+   /* public static function resourcesIn($directory)
     {
         $namespace = app()->getNamespace();
 
@@ -82,10 +92,10 @@ class Graph
      * @param $key
      * @return mixed
      */
-    public static function resourceForKey($key)
+   /* public static function resourceForKey($key)
     {
         return collect(static::$resources)->first(function ($value) use ($key) {
             return $value::uriKey() === $key;
         });
-    }
+    }*/
 }

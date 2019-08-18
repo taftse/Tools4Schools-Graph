@@ -3,6 +3,8 @@
 namespace Tools4Schools\Graph;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
+use Tools4Schools\Graph\Http\Middleware\ServeGraphRequests;
 
 class GraphCoreServiceProvider extends ServiceProvider
 {
@@ -16,6 +18,8 @@ class GraphCoreServiceProvider extends ServiceProvider
         if($this->app->runningInConsole()){
             $this->app->register(GraphServiceProvider::class);
         }
+
+        $this->app->make(HttpKernel::class)->pushMiddleware(ServeGraphRequests::class);
     }
 
     /**

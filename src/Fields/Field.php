@@ -25,11 +25,15 @@ class Field
     protected $fieldName;
 
     /**
-     * Should this field be hidden from the index request
+     * The field's resolved value.
      *
-     * @var bool
+     * @var mixed
      */
-    public $hideFromIndex = false;
+    public $value;
+
+
+
+
 
     /**
      * The creation and update Rules
@@ -40,10 +44,10 @@ class Field
 
 
 
-    public function __construct($displayName,$fieldName,Closure $format)
+    public function __construct(String $displayName,String $fieldName = null,Closure $format)
     {
         $this->displayName = $displayName;
-        $this->fieldName = $fieldName;
+        $this->fieldName = $fieldName?? str_replace(' ','_',Str::lower($displayName));
     }
 
     public static function make($displayName = '',$fieldName,Closure $format)
@@ -112,14 +116,5 @@ class Field
         return $this->rules['update'];
     }
 
-    public function hideFromIndex()
-    {
-        $this->hideFromIndex = true;
-        return $this;
-    }
 
-    public function searchable()
-    {
-        return $this;
-    }
 }

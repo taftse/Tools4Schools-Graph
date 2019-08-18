@@ -17,12 +17,12 @@ class GraphServiceProvider extends ServiceProvider
     public function boot()
     {
         // register the service providers
-        $this->publishes([
+       /* $this->publishes([
             __DIR__.'/Console/stubs/GraphServiceProvider.stub' => app_path('Providers/GraphServiceProvider.php'),
         ], 'graph-provider');
+*/
 
-
-      //  $this->registerRoutes();
+        $this->registerRoutes();
 
         //Graph::resourcesIn(app_path('Graph'));
     }
@@ -50,7 +50,7 @@ class GraphServiceProvider extends ServiceProvider
         return [
             'namespace' => 'Tools4Schools\Graph\Http\Controllers',
             'as' => 'graph.api.',
-            'prefix' => 'graph-api',
+            'prefix' => 'graph',
            // 'middleware' => 'graph',
         ];
     }
@@ -64,11 +64,11 @@ class GraphServiceProvider extends ServiceProvider
     public function register()
     {
         //$this->registerResourceMakeCommand();
-        $this->commands([
+     /*   $this->commands([
             Console\InstallCommand::class,
             Console\ResourceMakeCommand::class,
             Console\FilterMakeCommand::class
-        ]);
+        ]);*/
 
     }
 }
