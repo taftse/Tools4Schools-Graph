@@ -10,26 +10,79 @@ namespace Tools4Schools\Graph\Fields;
 
 class Field
 {
+
+    protected $name;
+
+
+    protected $type;
+
+
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
+    public static function make(...$arguments)
+    {
+        return new static(...$arguments);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * Display name of the field
      *
      * @var string
      */
-    protected $displayName;
+   // protected $displayName;
 
     /**
      * Field name
      *
      * @var string
      */
-    protected $fieldName;
+   // protected $fieldName;
 
     /**
      * The field's resolved value.
      *
      * @var mixed
      */
-    public $value;
+   // public $value;
 
 
 
@@ -40,7 +93,7 @@ class Field
      *
      * @var array
      */
-    protected $rules = ['creation'=>[],'update'=>[]];
+  /*  protected $rules = ['creation'=>[],'update'=>[]];
 
 
 
@@ -116,5 +169,5 @@ class Field
         return $this->rules['update'];
     }
 
-
+*/
 }

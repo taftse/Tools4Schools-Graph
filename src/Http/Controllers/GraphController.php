@@ -7,6 +7,7 @@ namespace Tools4Schools\Graph\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Tools4Schools\Graph\Graph;
 
 class GraphController extends Controller
 {

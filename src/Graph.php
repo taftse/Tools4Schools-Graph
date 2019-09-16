@@ -8,6 +8,9 @@
 
 namespace Tools4Schools\Graph;
 
+use GraphQL\GraphQL;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Schema;
 use ReflectionClass;
 use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
@@ -34,22 +37,48 @@ class Graph
 
 
 
-    public static function path(){
+    public static function path()
+    {
         return config('graph.path','/graph');
     }
 
 
+    /**
+     * run a graphquery
+     * @param $query
+     * @return \GraphQL\Executor\ExecutionResult
+     */
+    public static function query($query)
+    {
+        return GraphQL::executeQuery(static::Schema(),$query);
+    }
+
+    /**
+     * load a graphql compatible schema from our registered resources
+     */
+    public static function Schema()
+    {
+        $queries = ['name'=>'Query','fields'=>[]];
+        $mutations = ['name'=>'Mutations','fields'=>[]];
+
+        foreach (static::$resources as $type){
 
 
+           array_pull($queries['fields'],(new $type())->getQueries());
 
+           //array_pull($mutations['fields'],(new $type())->getMutations());
+        }
 
-  /*  /**
+        return new Schema(['query'=>new ObjectType($queries),'mutation'=>new ObjectType($mutations)]);
+    }
+
+    /**
      * Register the given reources
      *
      * @param array $resources
      * @return Graph
      */
-  /*  public static function resources(array $resources)
+    public static function resources(array $resources)
     {
         static::$resources = array_merge(static::$resources,$resources);
 
@@ -62,7 +91,7 @@ class Graph
      * @param $directory
      * @return void
      */
-   /* public static function resourcesIn($directory)
+    public static function resourcesIn($directory)
     {
         $namespace = app()->getNamespace();
 
@@ -75,7 +104,7 @@ class Graph
                     Str::after($resource->getPathname(), app_path().DIRECTORY_SEPARATOR)
                 );
 
-            if (is_subclass_of($resource, Resource::class) &&
+            if (is_subclass_of($resource, GraphResource::class) &&
                 ! (new ReflectionClass($resource))->isAbstract()) {
                 $resources[] = $resource;
             }
@@ -92,10 +121,10 @@ class Graph
      * @param $key
      * @return mixed
      */
-   /* public static function resourceForKey($key)
+    public static function resourceForKey($key)
     {
         return collect(static::$resources)->first(function ($value) use ($key) {
             return $value::uriKey() === $key;
         });
-    }*/
+    }
 }

@@ -23,6 +23,8 @@ class GraphServiceProvider extends ServiceProvider
 */
 
         $this->registerRoutes();
+        $this->resources();
+
 
         //Graph::resourcesIn(app_path('Graph'));
     }
@@ -70,5 +72,15 @@ class GraphServiceProvider extends ServiceProvider
             Console\FilterMakeCommand::class
         ]);*/
 
+    }
+
+    /**
+     * Register the application's Graph resources.
+     *
+     * @return void
+     */
+    protected function resources()
+    {
+        Graph::resourcesIn(app_path('Graph'));
     }
 }
