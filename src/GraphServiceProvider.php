@@ -16,11 +16,7 @@ class GraphServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // register the service providers
-       /* $this->publishes([
-            __DIR__.'/Console/stubs/GraphServiceProvider.stub' => app_path('Providers/GraphServiceProvider.php'),
-        ], 'graph-provider');
-*/
+
 
         $this->registerRoutes();
         $this->resources();
@@ -37,24 +33,12 @@ class GraphServiceProvider extends ServiceProvider
      */
     protected function registerRoutes()
     {
-        Route::group($this->routeConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__.'/../routes/graph.php');
-        });
-    }
-
-    /**
-     * Get the Nova route group configuration array.
-     *
-     * @return array
-     */
-    protected function routeConfiguration()
-    {
-        return [
-            'namespace' => 'Tools4Schools\Graph\Http\Controllers',
-            'as' => 'graph.api.',
-            'prefix' => 'graph',
-           // 'middleware' => 'graph',
-        ];
+        Route::middleware('graph.middleware',[])
+            ->domain('graph.domain',null)
+            ->group(function (){
+                Route::get(GraphServer::path(),'Tools4Schools\Graph\Http\Controllers\GraphController@handle');
+                Route::post(GraphServer::path(),'Tools4Schools\Graph\Http\Controllers\GraphController@handle');
+            });
     }
 
 
@@ -81,6 +65,6 @@ class GraphServiceProvider extends ServiceProvider
      */
     protected function resources()
     {
-        Graph::resourcesIn(app_path('Graph'));
+        GraphServer::resourcesIn(app_path('Graph'));
     }
 }

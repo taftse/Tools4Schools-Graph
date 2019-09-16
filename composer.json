@@ -9,10 +9,10 @@
     }
   ],
   "require": {
-    "php": ">=7.0.0",
-    "illuminate/database": "^5.7",
-    "illuminate/support": "^5.7",
-    "webonyx/graphql-php": "dev-master"
+    "php": ">=7.2.0",
+    "illuminate/support": "5.8.*",
+    "webonyx/graphql-php": "dev-master",
+    "symfony/finder": "^4.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^7.0"
@@ -31,7 +31,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Tools4Schools\\Graph\\GraphCoreServiceProvider"
+        "Tools4Schools\\Graph\\GraphServiceProvider"
       ]
     }
   },

@@ -19,7 +19,7 @@ class GraphController extends Controller
 
         $query = $request->get('query');
 
-        return Graph::query($query);
+        return GraphServer::query($query);
 
     }
 }
