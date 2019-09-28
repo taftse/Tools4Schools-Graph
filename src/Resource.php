@@ -11,21 +11,20 @@ use Illuminate\Http\Request;
 abstract class Resource
 {
 
-    public static $name ='';
+    public static $name;
 
     public static $description ='';
 
+
+
+
     abstract public function fields();
 
-
-
-    public function getFields(){
-        return $this->fields();
-    }
+    //abstract public function
 
 
     public function getAttributes(){
-        $attributes['name'] = static::$name;
+        $attributes['name'] = $this->name();
         $attributes['description'] = static::$description;
         $attributes['fields'] = $this->getFields();
 
@@ -40,5 +39,27 @@ abstract class Resource
     public function toGraphType(): GraphqlType
     {
         return new ObjectType($this->toArray());
+    }
+
+    public function getFields()
+    {
+        $fields = [];
+
+        foreach ($this->fields() as $field)
+        {
+            $fields = $fields + $field->toGraphObject();
+        }
+        return $fields;
+    }
+
+    public function name():string
+    {
+
+        if(static::$name != '')
+        {
+            return static::$name;
+        }
+
+        return (new \ReflectionClass($this))->getShortName();
     }
 }

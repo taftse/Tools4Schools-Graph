@@ -1,40 +1,28 @@
 <?php
-
-
 namespace Tools4Schools\Graph\Fields;
 
 
-abstract class Field
+
+use GraphQL\Type\Definition\Type as GraphqlType;
+use Tools4Schools\Graph\GraphElement;
+
+abstract class Field extends GraphElement
 {
-
-    protected $name;
-
-
 
     public function __construct(string $name,string $attribute = null,$resolveCallback = null)
     {
         $this->name = $name;
     }
 
+    protected function args():array
+    {
+        return [];
+    }
+
+
     public function resolve($resource,$attribute = null):void
     {
 
     }
 
-
-
-
-    /***
-     * From Laravel\Nova\Element .php
-     */
-
-    /**
-     * Create a new element.
-     *
-     * @return static
-     */
-    public static function make(...$arguments)
-    {
-        return new static(...$arguments);
-    }
 }

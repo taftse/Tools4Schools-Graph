@@ -3,6 +3,7 @@
 namespace Tools4Schools\Graph;
 
 
+use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Tools4Schools\Graph\Console\ResourceMakeCommand;
@@ -19,7 +20,9 @@ class GraphServiceProvider extends ServiceProvider
 
 
         $this->registerRoutes();
-        $this->resources();
+        $this->registerQueries();
+        $this->registerResources();
+        $this->registerMutations();
 
 
         //Graph::resourcesIn(app_path('Graph'));
@@ -33,8 +36,10 @@ class GraphServiceProvider extends ServiceProvider
      */
     protected function registerRoutes()
     {
-        Route::middleware('graph.middleware',[])
-            ->domain('graph.domain',null)
+
+
+        Route::middleware(config('graph.middleware',[]))
+            ->domain(config('graph.domain',null))
             ->group(function (){
                 Route::get(GraphServer::path(),'Tools4Schools\Graph\Http\Controllers\GraphController@handle');
                 Route::post(GraphServer::path(),'Tools4Schools\Graph\Http\Controllers\GraphController@handle');
@@ -56,6 +61,10 @@ class GraphServiceProvider extends ServiceProvider
             Console\FilterMakeCommand::class
         ]);*/
 
+     $this->app->singleton('graphserver',function(Container $app):GraphServer{
+         return new GraphServer();
+     });
+
     }
 
     /**
@@ -63,8 +72,38 @@ class GraphServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function resources()
+    protected function registerResources()
     {
-        GraphServer::resourcesIn(app_path('Graph'));
+        GraphServer::resourcesIn(app_path('Graph\Types'));
+    }
+
+    /**
+     * Register the application's Graph Mutations.
+     *
+     * @return void
+     */
+    protected function registerMutations()
+    {
+        GraphServer::mutationsIn(app_path('Graph\Mutations'));
+    }
+
+    /**
+     * Register the application's Graph Queries.
+     *
+     * @return void
+     */
+    protected function registerQueries()
+    {
+        GraphServer::queriesIn(app_path('Graph\Queries'));
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return ['graphserver'];
     }
 }
