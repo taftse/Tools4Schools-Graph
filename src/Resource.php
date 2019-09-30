@@ -15,13 +15,7 @@ abstract class Resource
 
     public static $description ='';
 
-
-
-
     abstract public function fields();
-
-    //abstract public function
-
 
     public function getAttributes(){
         $attributes['name'] = $this->name();

@@ -177,7 +177,7 @@ class GraphServer
 
         try {
             $schema = new Schema([
-                'query' => new ObjectType(['name'=>'Query','fields'=>[$this->toGraphType(static::$queries)]]),
+                'query' => new ObjectType(['name'=>'Query','fields'=>$this->toGraphType(static::$queries)]),
                 //'mutations' =>$this->toGraphType(static::$mutations),
                // 'subscriptions' =>'',
                 //'types' => $this->toGraphType(static::$resources),
@@ -204,46 +204,23 @@ class GraphServer
 
     protected function toGraphType(array $objectTypes)
     {
-        return collect($objectTypes)->map(function ($object,$key){
-            return [$object->name() => $object->toGraphType()];
-            })->all();
+        $objects = [];
+        foreach ($objectTypes as $object)
+        {
+            $objects[$object->name()] = $object->toGraphType();
+        }
+        return $objects;
     }
 
     public function query(string $query){
 
-       $this->executeQuery(
-           new Schema(['query']),
-           new Document($query));
-
-
-
-
-        //return $this->queryAndReturnResults($query);
+      return $this->queryAndReturnResults($query);
     }
 
     protected function queryAndReturnResults(string $query)
     {
         $scheme = $this->schema();
         return GraphQL::executeQuery($scheme,$query,null);
-    }
-
-    public function executeQuery(Schema $schema,Document $document)
-    {
-        switch($document->getOperation())
-        {
-            case 'query':
-
-                break;
-            case 'mutation':
-
-                break;
-            case 'subscription':
-
-                break;
-            case 'introspection':
-
-                break;
-        }
     }
 
 }

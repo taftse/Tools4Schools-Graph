@@ -6,20 +6,44 @@ namespace Tools4Schools\Graph;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphqlType;
+use ReflectionClass;
+use Tools4Schools\Graph\Types\GraphType;
 
-abstract class Query
+abstract class Query extends GraphType
 {
-    /**
-     * @var string
-     */
-    protected static $name ='';
 
 
-    /**
-     * @var string
-     */
+    protected function args() : array
+    {
+        return [];
+    }
 
-    public static $description ='';
+
+    public function resolver($root = null,$args=null)
+    {
+        return function (){return 'hello world';};
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * @return array
@@ -27,11 +51,6 @@ abstract class Query
 
     abstract protected function type();
 
-    public function fields()
-    {
-        $type = $this->type();
-        return (new $type)->toGraphType();
-    }
 
     /**
      * @return Type
@@ -47,9 +66,10 @@ abstract class Query
     public function getAttributes():array
     {
         $attributes['name'] = $this->name();
-        $attributes['description'] = static::$description;
-        $attributes['fields'] = $this->fields();
+        $attributes['description'] = $this->description;
         $attributes['type'] = $this->getType();
+        $attributes['resolve'] = $this->resolver();
+        $attributes['args'] = $this->args();
 
         return $attributes;
     }
@@ -59,18 +79,9 @@ abstract class Query
         return $this->getAttributes();
     }
 
-    public function toGraphType(): GraphqlType
+    public function toGraphType()//: GraphqlType
     {
-        return new ObjectType($this->toArray());
-    }
-
-    public function name():string
-    {
-        if(static::$name != '')
-        {
-            return static::$name;
-        }
-
-        return (new \ReflectionClass($this))->getShortName();
+        return $this->toArray();
+        //return new ObjectType($this->toArray());
     }
 }

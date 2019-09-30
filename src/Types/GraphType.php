@@ -28,7 +28,7 @@ class GraphType implements JsonSerializable
     public $type;
 
 
-    public function __construct($name,array $fields = )
+    public function __construct()
     {
 
     }
@@ -57,7 +57,12 @@ class GraphType implements JsonSerializable
 
     public function toArray():array
     {
-        return []
+        return [];
+    }
+
+    public function jsonSerialize()
+    {
+
     }
 
 
