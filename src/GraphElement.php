@@ -10,11 +10,18 @@ use GraphQL\Type\Definition\ScalarType;
 abstract class GraphElement
 {
     /**
-     * The name of the field.
+     * The name of the element.
      *
      * @var string
      */
     public $name;
+
+    /**
+     * A description of the element
+     *
+     * @var string
+     */
+    public $description;
 
     /**
      * The type of object that is returned
@@ -42,7 +49,7 @@ abstract class GraphElement
             return [$this->name()=>$this->type()];
         }
 
-        return [$this->name()=>new ObjectType($this->toArray())];
+        return [$this->name()=> new ObjectType($this->toArray())];
     }
 
 

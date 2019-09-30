@@ -175,12 +175,20 @@ class GraphServer
             return $schema;
         }
 
-        return new Schema([
-            'query' => new ObjectType(['name'=>'Query','fields'=>['Get User Query'=>$this->toGraphType(static::$queries)]]),
-            //'mutations' =>$this->toGraphType(static::$mutations),
-           // 'subscriptions' =>'',
-            'types' => $this->toGraphType(static::$resources),
-        ]);
+        try {
+            $schema = new Schema([
+                'query' => new ObjectType(['name'=>'Query','fields'=>[$this->toGraphType(static::$queries)]]),
+                //'mutations' =>$this->toGraphType(static::$mutations),
+               // 'subscriptions' =>'',
+                //'types' => $this->toGraphType(static::$resources),
+            ]);
+
+
+            $schema->assertValid();
+        } catch (GraphQL\Error\InvariantViolation $e) {
+            dump($e->getMessage());
+        }
+        return $schema;
     }
 
 
@@ -196,18 +204,46 @@ class GraphServer
 
     protected function toGraphType(array $objectTypes)
     {
-        return collect($objectTypes)->map(function ($object){
-            return $object->toGraphType();
-            })->values()->all();
+        return collect($objectTypes)->map(function ($object,$key){
+            return [$object->name() => $object->toGraphType()];
+            })->all();
     }
 
     public function query(string $query){
-        return $this->queryAndReturnresults($query);
+
+       $this->executeQuery(
+           new Schema(['query']),
+           new Document($query));
+
+
+
+
+        //return $this->queryAndReturnResults($query);
     }
 
-    protected function queryAndReturnresults(string $query)
+    protected function queryAndReturnResults(string $query)
     {
         $scheme = $this->schema();
         return GraphQL::executeQuery($scheme,$query,null);
     }
+
+    public function executeQuery(Schema $schema,Document $document)
+    {
+        switch($document->getOperation())
+        {
+            case 'query':
+
+                break;
+            case 'mutation':
+
+                break;
+            case 'subscription':
+
+                break;
+            case 'introspection':
+
+                break;
+        }
+    }
+
 }
