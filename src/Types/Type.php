@@ -8,7 +8,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphqlType;
 use Illuminate\Http\Request;
 
-abstract class Resource
+abstract class Type
 {
 
     public static $name;

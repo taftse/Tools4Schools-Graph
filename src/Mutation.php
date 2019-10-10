@@ -4,7 +4,7 @@
 namespace Tools4Schools\Graph;
 
 
-abstract class Mutation
+abstract class Mutation extends Query
 {
 
 }

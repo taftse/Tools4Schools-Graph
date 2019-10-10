@@ -13,6 +13,10 @@ use ReflectionClass;
 use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
 use Tools4Schools\Graph\Exceptions\TypeNotFoundException;
+use Tools4Schools\Graph\Language\AST\OperationDefinition;
+use Tools4Schools\Graph\Language\Lexer;
+use Tools4Schools\Graph\Language\Parser;
+use Tools4Schools\Graph\Language\AST\Document;
 
 class GraphServer
 {
@@ -82,7 +86,7 @@ class GraphServer
      */
     public static function resourcesIn($directory)
     {
-        $resources = static::getFiles($directory,Resource::class);
+        $resources = static::getFiles($directory,Type::class);
 
         static::resources(
             collect($resources)->sort()->all()
@@ -214,7 +218,15 @@ class GraphServer
 
     public function query(string $query){
 
-      return $this->queryAndReturnResults($query);
+        $parser = new Parser(new Lexer());
+        $requestDocument = $parser->parse($query);
+        dump($requestDocument);
+
+        $scheme = new Schema([]);
+
+
+        return $this->executeRequest($scheme,$requestDocument);
+      //return $this->queryAndReturnResults($query);
     }
 
     protected function queryAndReturnResults(string $query)
@@ -222,5 +234,43 @@ class GraphServer
         $scheme = $this->schema();
         return GraphQL::executeQuery($scheme,$query,null);
     }
+
+
+    protected function executeRequest(Schema $scheme,Document $requestDocument,string $operationName = null,$variableValue = null,$initialValue = null)
+    {
+        $operation = $requestDocument->getOperation($operationName);
+
+        $coercedVariableValues = '';//CoerceVariableValues(schema, operation, variableValues).
+
+        switch ($operation) {
+            case "query":
+                return $this->executeQuery($operation,$scheme,$coercedVariableValues,$initialValue);
+                break;
+            case "migration":
+                return $this->executeMutation($operation,$scheme,$coercedVariableValues,$initialValue);
+                break;
+            case "subscription":
+                return $this->executeSubscription($operation,$scheme,$coercedVariableValues,$initialValue);
+                break;
+            default:
+                throw new \Exception("unsupported operation");
+        }
+    }
+
+    protected function executeQuery(OperationDefinition $operation, Schema $schema, $coercedVariableValues = null, $initialValue = null)
+    {
+        return'Query';
+    }
+
+    protected function executeMutation(OperationDefinition $operation, Schema $schema, $coercedVariableValues = null, $initialValue = null)
+    {
+        return'Mutate';
+    }
+
+    protected function executeSubscription(OperationDefinition $operation, Schema $schema, $coercedVariableValues = null, $initialValue = null)
+    {
+        return'Subscribed';
+    }
+
 
 }
