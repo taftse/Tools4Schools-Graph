@@ -37,4 +37,15 @@ class OperationDefinition implements ExecutableDefinition
     {
         return $this->name;
     }
+
+    /**
+     * Gets the operation type
+     * Available options are Query, Mutation and Subscription
+     *
+     * @return string
+     */
+    public function getType():string
+    {
+        return $this->operation;
+    }
 }

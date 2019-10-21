@@ -1,5 +1,5 @@
 <?php
-namespace Tools4Schools\Graph
+namespace Tools4Schools\Graph;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;

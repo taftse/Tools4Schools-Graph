@@ -101,9 +101,15 @@ class Lexer implements LexerContract
         }
 
         // is the token punctuation
-        if(preg_match('/[!$()=[\]{|}:]|[.]{3}/',$this->text[$textPosition]))
+        if(preg_match('/[!$()=[\]{|}:.]/',$this->text[$textPosition]))
         {
             $this->textPosition ++;
+            if($this->text[$textPosition] == '.' && $this->text[$textPosition+1] == '.' && $this->text[$textPosition+2] == '.')
+            {
+                $this->textPosition = $this->textPosition+2;
+                return new Token(SupportedTokens::SPREAD,'...',$textPosition);
+            }
+
             return new Token($this->text[$textPosition],$this->text[$textPosition],$textPosition);
         }
 
@@ -118,10 +124,22 @@ class Lexer implements LexerContract
             return $this->readInteger();
         }
 
+        if($this->text[$textPosition] == "\"")
+        {
+            return $this->readString();
+        }
+
         // if the next character a integer
 
        // $this->textPosition ++;
-        throw new \Exception($this->text[$textPosition]);
+        //throw new \Exception($this->text[$textPosition]);
+
+        throw new \UnexpectedValueException(
+            'previous: '.$this->previous()->type().' '.$this->previous()->value().
+            ' current: '.$textPosition.' '.$this->text[$textPosition].
+            ' next: '.($textPosition+1).' '.$this->text[$textPosition+1]
+
+        );
 
         //return $this->text[$textPosition];
     }
@@ -138,6 +156,17 @@ class Lexer implements LexerContract
         }while(preg_match('/[_A-Za-z][_0-9A-Za-z]*/',$this->text[$this->textPosition]));
 
         return new Token(SupportedTokens::NAME,$value,$startPosition);
+    }
+
+    //@todo  Finish this function
+    protected function readString():Token
+    {
+        $startPosition = $this->textPosition;
+
+        // check if the next 2 characters are also " if yes block string
+
+        throw new \Exception("This function has not been completed you lazy sod");
+
     }
 
     protected function readInteger():Token

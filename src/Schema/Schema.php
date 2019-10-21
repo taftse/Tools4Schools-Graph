@@ -6,7 +6,7 @@
  * Time: 14:10
  */
 
-namespace Tools4Schools\Graph;
+namespace Tools4Schools\Graph\Schema;
 
 
 use Tools4Schools\Graph\Types\GraphType;

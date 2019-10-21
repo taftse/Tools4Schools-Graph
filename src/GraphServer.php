@@ -43,6 +43,10 @@ class GraphServer
     public static $mutations = [];
 
 
+    /**
+     * @var array
+     */
+    public static $subscriptions = [];
 
     /**
      * Get the URI path prefix utilized by Nova.
@@ -173,7 +177,7 @@ class GraphServer
      * @param  Schema|array|string|null  $schema
      * @return Schema
      */
-    public function schema($schema = null): Schema
+  /*  public function schema($schema = null): Schema
     {
         if ($schema instanceof Schema) {
             return $schema;
@@ -193,7 +197,7 @@ class GraphServer
             dump($e->getMessage());
         }
         return $schema;
-    }
+    }*/
 
 
     public static function type(string $name):GraphqlType
@@ -205,7 +209,7 @@ class GraphServer
 
         return static::$resources[$name]->toGraphType();
     }
-
+/*
     protected function toGraphType(array $objectTypes)
     {
         $objects = [];
@@ -214,7 +218,7 @@ class GraphServer
             $objects[$object->name()] = $object->toGraphType();
         }
         return $objects;
-    }
+    }*/
 
     public function query(string $query){
 
@@ -229,11 +233,11 @@ class GraphServer
       //return $this->queryAndReturnResults($query);
     }
 
-    protected function queryAndReturnResults(string $query)
+    /*protected function queryAndReturnResults(string $query)
     {
         $scheme = $this->schema();
         return GraphQL::executeQuery($scheme,$query,null);
-    }
+    }*/
 
 
     protected function executeRequest(Schema $scheme,Document $requestDocument,string $operationName = null,$variableValue = null,$initialValue = null)
@@ -242,16 +246,13 @@ class GraphServer
 
         $coercedVariableValues = '';//CoerceVariableValues(schema, operation, variableValues).
 
-        switch ($operation) {
+        switch ($operation->getType()) {
             case "query":
                 return $this->executeQuery($operation,$scheme,$coercedVariableValues,$initialValue);
-                break;
             case "migration":
                 return $this->executeMutation($operation,$scheme,$coercedVariableValues,$initialValue);
-                break;
             case "subscription":
                 return $this->executeSubscription($operation,$scheme,$coercedVariableValues,$initialValue);
-                break;
             default:
                 throw new \Exception("unsupported operation");
         }

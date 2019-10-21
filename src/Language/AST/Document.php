@@ -11,19 +11,16 @@ namespace Tools4Schools\Graph\Language\AST;
 
 class Document
 {
-    protected $operations =[];
+    protected $operations = [];
 
-    public function __construct()
-    {
-
-    }
+    protected $fragments = [];
 
     public function getOperation($operationName = null):OperationDefinition
     {
         //If operationName is null:
         if(is_null($operationName)) {
             //If document contains exactly one operation.
-            if(count($this->operations) >1)
+            if(count($this->operations) == 1)
             {
                 //Return the Operation contained in the document.
                 return reset($this->operations);
@@ -44,11 +41,21 @@ class Document
 
     public function addDirective(ExecutableDefinition $operation)
     {
-        if($operation->getName() =='')
+        if( $operation instanceof OperationDefinition)
         {
-            $this->operations[] = $operation;
-        }else{
-            $this->operations[$operation->getName()]= $operation;
+            if($operation->getName() =='')
+            {
+                $this->operations[] = $operation;
+            }else{
+                $this->operations[$operation->getName()]= $operation;
+            }
+        }else if($operation instanceof FragmentDefinition){
+            if($operation->getName() =='')
+            {
+                $this->fragments[] = $operation;
+            }else{
+                $this->fragments[$operation->getName()]= $operation;
+            }
         }
 
     }
