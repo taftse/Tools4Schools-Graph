@@ -2,26 +2,45 @@
 
 namespace Tools4Schools\Graph\Language\AST;
 
+use Tools4Schools\Graph\Contracts\Language\Request\AST\Node as NodeContract;
 
-class Field
+class Field extends Node implements NodeContract
 {
-
-    protected $name;
-
     protected $alias = null;
 
     protected $arguments = [];
 
-    protected $directives = [];
-
-    protected $selectionSets = [];
-
-    public function __construct($name,$alias = null,array $arguments,array $directives,$selectionSets)
+    public function __construct($name,$alias = null,array $arguments = [],array $directives,$selectionSet)
     {
         $this->name = $name;
         $this->alias = $alias;
         $this->arguments = $arguments;
         $this->directives = $directives;
-        $this->selectionSets = $selectionSets;
+        $this->selectionSet = $selectionSet;
+    }
+
+
+    public function hasDirective($directive)
+    {
+        return isset($this->directives[$directive]);
+    }
+
+    public function getNameOrAlias()
+    {
+        if(!is_null($this->alias))
+        {
+            return $this->alias;
+        }
+        return $this->name;
+    }
+
+    public function hasArguments():bool
+    {
+        return is_null($this->arguments);
+    }
+
+    public function getArguments():array
+    {
+        return $this->arguments;
     }
 }

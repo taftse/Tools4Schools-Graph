@@ -3,11 +3,11 @@
 
 namespace Tools4Schools\Graph\Fields;
 
-// returns a single object
-class HasOne extends Field
+
+class Integer extends Field
 {
     public function type()
     {
-        return 'LIST';
+        return 'Int';
     }
 }

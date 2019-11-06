@@ -32,7 +32,10 @@
     "laravel": {
       "providers": [
         "Tools4Schools\\Graph\\GraphServiceProvider"
-      ]
+      ],
+      "aliases": {
+        "GraphServer": "Tools4Schools\\Graph\\Support\\Facades"
+      }
     }
   },
   "suggest": {

@@ -11,7 +11,7 @@ class ID extends Field
 
 
     public function type(){
-        return Type::ID();
+        return 'ID';
     }
 
 
@@ -19,4 +19,6 @@ class ID extends Field
     {
         parent::__construct($name ?? 'ID', $attribute, $resolveCallback);
     }
+
+
 }

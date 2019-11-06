@@ -66,7 +66,7 @@ class Parser implements ParserContract
             $this->lexer->advance();
             return $token;
         }
-        dump($this->lexer);
+        //dump($this->lexer);
         // throw error Expected TokenType but found current token type
         throw new \Exception('Expected '.$tokenType.' but found '.$token->type(). ' token no '.(count($this->lexer->tokens) -2 ) .' Character no '.$token->position());
     }
@@ -302,7 +302,7 @@ class Parser implements ParserContract
                  $arguments[] = $this->parseArgument();
              }while($this->lexer->current()->type() != SupportedTokens::PAREN_R);
              $this->lexer->advance();
-             dump($this->lexer);
+           //  dump($this->lexer);
 
          }
          return $arguments;
@@ -400,13 +400,18 @@ class Parser implements ParserContract
         $variable = $this->parseVariable();
         $this->expectedType(SupportedTokens::COLON);
         $type = $this->parseTypeReference();
-
-        die( 'bla');
      }
 
      protected function parseVariable()
      {
         $this->lexer->expects(SupportedTokens::DOLLAR);
         return $this->parseName();
+     }
+
+     protected function parseInt()
+     {
+         $value = $this->lexer->current()->value();
+         $this->lexer->advance();
+         return $value;
      }
 }

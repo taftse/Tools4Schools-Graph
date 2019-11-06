@@ -20,9 +20,18 @@ abstract class Field extends GraphElement
     }
 
 
-    public function resolve($resource,$attribute = null):void
+    public function resolve($resource,$attribute = null)
     {
-
+        return $this->name;
     }
 
+
+
+    protected function completeValue($fields,$result,$variableValues)
+    {
+        if(!is_null($this->type()))
+        {
+            
+        }
+    }
 }

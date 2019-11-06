@@ -19,8 +19,9 @@ class GraphController extends Controller
         }
 
         $query = $request->get('query');
-
-        return GraphServer::query($query);
+        $variables = $request->get('variables');
+        $operationName = $request->get('operationName');
+        return GraphServer::query($query,$operationName,$variables);
 
     }
 }

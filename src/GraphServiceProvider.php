@@ -19,10 +19,11 @@ class GraphServiceProvider extends ServiceProvider
     {
 
 
+
+
         $this->registerRoutes();
-        $this->registerQueries();
-        $this->registerResources();
-        $this->registerMutations();
+
+
 
 
         //Graph::resourcesIn(app_path('Graph'));
@@ -54,6 +55,8 @@ class GraphServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        //$this->app->singleton(GraphServer::class);
+
         //$this->registerResourceMakeCommand();
      /*   $this->commands([
             Console\InstallCommand::class,
@@ -65,6 +68,10 @@ class GraphServiceProvider extends ServiceProvider
          return new GraphServer();
      });
 
+        $this->registerTypes();
+        $this->registerQueries();
+        $this->registerMutations();
+
     }
 
     /**
@@ -72,9 +79,9 @@ class GraphServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerResources()
+    protected function registerTypes()
     {
-        GraphServer::resourcesIn(app_path('Graph\Types'));
+       $this->app['graphserver']->typesIn(app_path('Graph\Types'));
     }
 
     /**
@@ -84,7 +91,7 @@ class GraphServiceProvider extends ServiceProvider
      */
     protected function registerMutations()
     {
-        GraphServer::mutationsIn(app_path('Graph\Mutations'));
+        $this->app['graphserver']->typesIn(app_path('Graph\Mutations'));
     }
 
     /**
@@ -94,7 +101,7 @@ class GraphServiceProvider extends ServiceProvider
      */
     protected function registerQueries()
     {
-        GraphServer::queriesIn(app_path('Graph\Queries'));
+        $this->app['graphserver']->typesIn(app_path('Graph\Queries'));
     }
 
     /**

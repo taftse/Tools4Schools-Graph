@@ -9,13 +9,22 @@
 namespace Tools4Schools\Graph\Language\AST;
 
 
+use Tools4Schools\Graph\Contracts\Language\Request\AST\ExecutableDefinition;
+
 class Document
 {
     protected $operations = [];
 
     protected $fragments = [];
 
-    public function getOperation($operationName = null):OperationDefinition
+    /**
+     * Gets the requested operation
+     *
+     * @param null $operationName
+     * @return OperationDefinition
+     * @throws \Exception
+     */
+    public function getOperation($operationName = null): OperationDefinition
     {
         //If operationName is null:
         if(is_null($operationName)) {
@@ -39,6 +48,11 @@ class Document
         throw new \Exception('The specified operation does not exist');
     }
 
+    /**
+     * Add a executable definition to the request document
+     *
+     * @param ExecutableDefinition $operation
+     */
     public function addDirective(ExecutableDefinition $operation)
     {
         if( $operation instanceof OperationDefinition)

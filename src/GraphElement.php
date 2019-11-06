@@ -23,6 +23,10 @@ abstract class GraphElement
      */
     public $description;
 
+    public $required = false;
+
+    public $depricated = false;
+
     /**
      * The type of object that is returned
      *
@@ -41,16 +45,6 @@ abstract class GraphElement
         return ['name'=>$this->name(),'type'=>$this->type()];
     }
 
-
-    public function toGraphObject():array
-    {
-        if($this->type() instanceof ScalarType)
-        {
-            return [$this->name()=>$this->type()];
-        }
-
-        return [$this->name()=> new ObjectType($this->toArray())];
-    }
 
 
     public function name():string
@@ -73,4 +67,25 @@ abstract class GraphElement
         return new static(...$arguments);
     }
 
+    /**
+     * Marks this as a required imput
+     *
+     * @return $this
+     */
+    public function required()
+    {
+        $this->required = true;
+        return $this;
+    }
+
+    /**
+     * Marks this as a required imput
+     *
+     * @return $this
+     */
+    public function deprecated()
+    {
+        $this->deprecated = true;
+        return $this;
+    }
 }

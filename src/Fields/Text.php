@@ -9,6 +9,6 @@ use GraphQL\Type\Definition\Type;
 class Text extends Field
 {
     public function type(){
-        return Type::string();
+        return 'String';
     }
 }

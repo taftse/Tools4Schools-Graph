@@ -9,7 +9,10 @@
 namespace Tools4Schools\Graph\Language\AST;
 
 
-class OperationDefinition implements ExecutableDefinition
+use Tools4Schools\Graph\Contracts\Language\Request\AST\ExecutableDefinition;
+
+
+class OperationDefinition extends Node implements ExecutableDefinition
 {
     protected $name ='';
 
@@ -19,7 +22,6 @@ class OperationDefinition implements ExecutableDefinition
 
     protected $directives;
 
-    protected $selectionSet;
 
     public function __construct($operation,$name='',array $variableDefinitions = [],array $selectionSet = [],$directives = null)
     {
@@ -30,13 +32,6 @@ class OperationDefinition implements ExecutableDefinition
         $this->selectionSet = $selectionSet;
     }
 
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
 
     /**
      * Gets the operation type
@@ -48,4 +43,5 @@ class OperationDefinition implements ExecutableDefinition
     {
         return $this->operation;
     }
+
 }
