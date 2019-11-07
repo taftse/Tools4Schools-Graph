@@ -36,7 +36,7 @@ class Field extends Node implements NodeContract
 
     public function hasArguments():bool
     {
-        return is_null($this->arguments);
+        return !is_null($this->arguments);
     }
 
     public function getArguments():array

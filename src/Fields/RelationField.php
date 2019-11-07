@@ -4,7 +4,7 @@
 namespace Tools4Schools\Graph\Fields;
 
 
-class Float
+abstract class RelationField extends Field
 {
 
 }

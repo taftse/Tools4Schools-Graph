@@ -7,12 +7,12 @@ namespace Tools4Schools\Graph\Tests\Fixtures;
 
 
 use Illuminate\Http\Request;
-use Tools4Schools\Graph\Type;
+use Tools4Schools\Graph\ObjectType;
 use Tools4Schools\Graph\Fields\ID;
 use Tools4Schools\Graph\Fields\Text;
 use Tools4Schools\Graph\Fields\HasOne;
 
-class UserType extends Type
+class UserType extends ObjectType
 {
     public static $model = \Tools4Schools\Graph\Tests\Fixtures\User::class;
 

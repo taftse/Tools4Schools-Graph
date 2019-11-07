@@ -87,7 +87,7 @@ class GraphServer
                      ['\\', ''],
                      Str::after($file->getPathname(), app_path().DIRECTORY_SEPARATOR)
                  );
-             if(is_subclass_of($file, Type::class) &&
+             if(is_subclass_of($file, ObjectType::class) &&
                  ! (new ReflectionClass($file))->isAbstract()) {
                  $this->schema->addType(new $file);
              }
@@ -133,7 +133,7 @@ class GraphServer
 
         // check that the query type exists on the schema
 
-
+    $results =[];
 
         foreach ($query->getSelectionSet() as $field) {
             // if field exists in the schema
@@ -141,10 +141,12 @@ class GraphServer
             //dump($this->schema);
             if($this->schema->hasType($field->getName()))
             {
-               $this->schema->getType($field->getName())->resolve($field);
+                $results['data'][$field->getName()] = $this->schema->getType($field->getName())->resolve($field);
+            }else{
+                $results['errors']['message'] =  'cannot query field \"'.$field->getName().'\" on type \"'.$query->getType().'\".';
             }
         }
-return '';
+return $results;
         //$selectionSet = $query->collectFields($query,$variableValues);//$query->getSelectionSet();
 
         //$data = $this->executeSelectionSet($selectionSet,$queryType,$initialValue,$variableValues);

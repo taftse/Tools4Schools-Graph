@@ -4,10 +4,12 @@
 namespace Tools4Schools\Graph\Fields;
 
 // returns a single object
-class HasOne extends Field
+use Tools4Schools\Graph\Types\ListType;
+
+class HasOne extends RelationField
 {
     public function type()
     {
-        return 'LIST';
+        return new ListType();
     }
 }

@@ -12,7 +12,7 @@ namespace Tools4Schools\Graph\Schema;
 use Tools4Schools\Graph\Mutation;
 use Tools4Schools\Graph\Query;
 use Tools4Schools\Graph\Subscription;
-use Tools4Schools\Graph\Type;
+use Tools4Schools\Graph\ObjectType;
 use Tools4Schools\Graph\Types\GraphType;
 
 class Schema
@@ -27,10 +27,10 @@ class Schema
     /**
      * Adds a Type to the schema
      *
-     * @param Type $type
+     * @param ObjectType $type
      * @throws \Exception
      */
-    public function addType(Type $type)
+    public function addType(ObjectType $type)
     {
         if($type instanceof Mutation)
         {
@@ -44,7 +44,7 @@ class Schema
         {
             $this->operationTypes['subscription'][$type->name()] = $type;
         }
-        else if($type instanceof Type)
+        else if($type instanceof ObjectType)
         {
             $this->types[$type->name()] = $type;
         }
@@ -73,9 +73,9 @@ class Schema
     /**
      *  returns the root operation type
      * @param $type
-     * @return Type
+     * @return ObjectType
      */
-    public function getOperationType($type): Type
+    public function getOperationType($type): ObjectType
     {
         return $this->operationTypes[$type];
     }
@@ -97,10 +97,10 @@ class Schema
      * Gets the requested type from the schema
      *
      * @param string $typeName
-     * @return Type
+     * @return ObjectType
      * @throws \Exception
      */
-    public function getType(string $typeName):Type
+    public function getType(string $typeName):ObjectType
     {
         if(!$this->hasType($typeName))
         {

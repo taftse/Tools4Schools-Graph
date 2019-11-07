@@ -7,7 +7,7 @@ namespace Tools4Schools\Graph;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 
-abstract class GraphElement
+abstract class BaseType
 {
     /**
      * The name of the element.
@@ -23,28 +23,33 @@ abstract class GraphElement
      */
     public $description;
 
+    /**
+     * is this a required field and as such should it always be returned
+     *
+     * @var bool
+     */
     public $required = false;
 
-    public $depricated = false;
+    /**
+     * is this a deprecated field
+     *
+     * @var bool
+     */
+    public $deprecated = false;
 
     /**
-     * The type of object that is returned
+     * the resolved value of this type
      *
-     * @return mixed
+     * @var
      */
-    abstract public function type();
+    public $value;
 
 
-    /**
-     * converts this object to an array
-     *
-     * @return array
-     */
-    public function toArray()
+    public function __construct(string $name = '')
     {
-        return ['name'=>$this->name(),'type'=>$this->type()];
+        $this->name = $name;
+        return $this;
     }
-
 
 
     public function name():string
@@ -88,4 +93,7 @@ abstract class GraphElement
         $this->deprecated = true;
         return $this;
     }
+
+
+    abstract public function resolve($selectionSet,BaseType $parent = null);
 }

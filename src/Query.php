@@ -6,7 +6,7 @@ namespace Tools4Schools\Graph;
 
 use ReflectionClass;
 
-abstract class Query extends Type
+abstract class Query extends ObjectType
 {
 
     /**
@@ -40,7 +40,7 @@ abstract class Query extends Type
 
     abstract protected function type();
 
-    public function fields()
+    public function fields():array
     {
         // TODO: Implement fields() method.
     }
