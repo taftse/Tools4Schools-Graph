@@ -9,9 +9,14 @@
 namespace Tools4Schools\Graph\Language\AST;
 
 
-use Tools4Schools\Graph\Contracts\Language\Request\AST\ExecutableDefinition;
+use Tools4Schools\Graph\Contracts\Request\ExecutableDefinition;
+use Tools4Schools\Graph\Contracts\Request\Document as DocumentContract;
+use Tools4Schools\Graph\Contracts\Request\OperationDefinition;
+use Tools4Schools\Graph\Contracts\Request\FragmentDefinition;
+use Tools4Schools\Graph\Language\AST\Types\ObjectType;
 
-class Document
+
+class Document implements DocumentContract
 {
     protected $operations = [];
 
@@ -53,7 +58,7 @@ class Document
      *
      * @param ExecutableDefinition $operation
      */
-    public function addDirective(ExecutableDefinition $operation)
+    public function addDefinition(ExecutableDefinition $operation):void
     {
         if( $operation instanceof OperationDefinition)
         {
@@ -73,4 +78,19 @@ class Document
         }
 
     }
+
+
+
+
+    public function hasFragment(string $fragmentName):bool
+    {
+        return isset($this->fragments[$fragmentName]);
+    }
+
+    public function getFragment(string $fragmentName):FragmentDefinition
+    {
+        return $this->fragments[$fragmentName];
+    }
+
+
 }

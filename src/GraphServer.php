@@ -4,11 +4,10 @@
 namespace Tools4Schools\Graph;
 
 
-//use GraphQL\GraphQL;
-//use GraphQL\Type\Definition\ObjectType;
-//use GraphQL\Type\Definition\Type as GraphqlType ;
-//use GraphQL\Type\Definition\Type;
-//use GraphQL\Type\Schema;
+use Tools4Schools\Graph\Contracts\Resolver;
+use Tools4Schools\Graph\Contracts\Types\InputType;
+use Tools4Schools\Graph\Contracts\Schema\Types\Type;
+
 use ReflectionClass;
 use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
@@ -18,13 +17,21 @@ use Tools4Schools\Graph\Language\AST\FragmentDefinition;
 use Tools4Schools\Graph\Language\AST\FragmentSpread;
 use Tools4Schools\Graph\Language\AST\InlineFragment;
 use Tools4Schools\Graph\Language\AST\OperationDefinition;
+use Tools4Schools\Graph\Language\AST\Types\NonNullType;
 use Tools4Schools\Graph\Language\Lexer;
 use Tools4Schools\Graph\Language\Parser;
 use Tools4Schools\Graph\Language\AST\Document;
 use Tools4Schools\Graph\Schema\Schema;
+use Tools4Schools\Graph\Schema\Types\ObjectType;
+
+//use Tools4Schools\Graph\Schema\Types\Type;
+
 
 class GraphServer
 {
+    public $resolvers = [];
+
+
     /**
      * the schema instance of this server
      *
@@ -33,7 +40,7 @@ class GraphServer
     public $schema;
 
     /**
-     * Get the URI path prefix utilized by Nova.
+     * Get the URI path prefix utilized by Graph server.
      *
      * @return string
      */
@@ -60,6 +67,35 @@ class GraphServer
     }
 
     /**
+     * Add a resolver to the list of available resolvers
+     *
+     * @param Resolver $resolver
+     */
+   /* public function registerResolver(Resolver $resolver):void
+    {
+        $this->resolvers[$resolver->name()] = new $resolver;
+    }
+
+    /**
+     * returns a resolver instance
+     * @param string $resolverName
+     * @return Resolver
+     */
+    /*public function getResolver(string $resolverName):Resolver
+    {
+        if($this->hasResolver($resolverName)) {
+            return $this->resolvers[$resolverName];
+        }
+
+        throw new ResolverNotFoundException("no resolver of the type [".$resolverName."] Found");
+    }
+
+    public function hasResolver(string $resolverName):bool
+    {
+        return isset($this->resolvers[$resolverName]);
+    }*/
+
+    /**
      * Register the given types.
      *
      * @param  array  $types
@@ -68,8 +104,6 @@ class GraphServer
      public function types(array $types)
      {
          $this->schema->addType($types);
-
-
      }
         /**
          * Register all of the type classes in the given directory.
@@ -87,7 +121,7 @@ class GraphServer
                      ['\\', ''],
                      Str::after($file->getPathname(), app_path().DIRECTORY_SEPARATOR)
                  );
-             if(is_subclass_of($file, ObjectType::class) &&
+             if(is_subclass_of($file, Type::class) &&
                  ! (new ReflectionClass($file))->isAbstract()) {
                  $this->schema->addType(new $file);
              }
@@ -96,25 +130,24 @@ class GraphServer
 
      }
 
-
-
+    protected $requestDocument;
 
     public function query(string $query,string $operationName = null,$variableValue = null){
 
         $parser = new Parser(new Lexer());
-        $requestDocument = $parser->parse($query);
+        $this->requestDocument = $parser->parse($query);
 
-        return $this->executeRequest($requestDocument,$operationName,$variableValue);
+        return $this->executeRequest($this->requestDocument,$operationName,$variableValue);
     }
 
 
 
 
-    protected function executeRequest(Document $requestDocument,string $operationName = null,$variableValue = null,$initialValue = null)
+    protected function executeRequest(Document $requestDocument,string $operationName = null,$variableValues = null,$initialValue = null)
     {
         $operation = $requestDocument->getOperation($operationName);
 
-        $coercedVariableValues = '';//$this->CoerceVariableValues(schema, operation, variableValues);
+        $coercedVariableValues = $this->CoerceVariableValues($this->schema, $operation, $variableValues);
 
         switch ($operation->getType()) {
             case "query":
@@ -131,26 +164,37 @@ class GraphServer
     protected function executeQuery(OperationDefinition $query,  $variableValues = null, $initialValue = null)
     {
 
-        // check that the query type exists on the schema
+        $queryType = $this->schema->getType('Query');
+        $selectionSet = $query->getSelectionSet();
 
-    $results =[];
+
+
+        $data = $this->executeSelectionSet($selectionSet,$queryType,$initialValue,$variableValues);
+
+
+
+
+        // check that the query type exists on the schema
+       // dump($this->schema->getType('query')->hasField('__schema'));
+
+        //if($this->schema->getType('query')->hasField())
+//dump($this->schema);
+       /* $results = [];
 
         foreach ($query->getSelectionSet() as $field) {
             // if field exists in the schema
-           // dump($field);
-            //dump($this->schema);
-            if($this->schema->hasType($field->getName()))
-            {
-                $results['data'][$field->getName()] = $this->schema->getType($field->getName())->resolve($field);
-            }else{
-                $results['errors']['message'] =  'cannot query field \"'.$field->getName().'\" on type \"'.$query->getType().'\".';
+
+            if ($this->schema->getType('Query')->hasField($field->getName())) {
+                $results['data'][$field->getName()] = $this->schema->getType('Query')->getField($field->getName())->resolve(null, [], $this->resolvers, $field);
+            } else {
+                $results['errors']['message'] = 'cannot query field \"' . $field->getName() . '\" on type \"' . $query->getType() . '\".';
             }
         }
-return $results;
+        return $results;
         //$selectionSet = $query->collectFields($query,$variableValues);//$query->getSelectionSet();
 
         //$data = $this->executeSelectionSet($selectionSet,$queryType,$initialValue,$variableValues);
-        //return$data ;
+        //return$data ;*/
     }
 
     protected function executeMutation(OperationDefinition $operation, Schema $schema, $coercedVariableValues = null, $initialValue = null)
@@ -166,22 +210,104 @@ return $results;
 
     protected function executeSelectionSet($selectionSet,$objectType,$objectValue,$variableValues)
     {
-        $groupedFieldSet = $selectionSet;//$objectType->collectFields($objectType,$selectionSet,$variableValues);
-        dump($groupedFieldSet);
+
+        //dd($selectionSet->collectFields($objectType,$selectionSet,$variableValues));
+        $groupedFieldSet = $objectType->collectFields($this->request,$selectionSet,$variableValues);
+       // $groupedFieldSet = $this->collectFields($objectType,$selectionSet,$variableValues);
+
+
+
         $result = [];
-        foreach($groupedFieldSet as $field)
+        foreach($groupedFieldSet as $responseKey => $fields)
         {
-            //$result[$field->name()] =
+            $fieldName = $field->name();
+            $fieldType = $field->type();
+            if($this->schema->hasType($fieldType))
+            {
+                $responseValue = ExecuteField($objectType,$objectValue,$fields,$fieldType,$variableValues);
+                $result[$responseKey] = $responseValue;
+            }
         }
+        return $result;
+
+    }
+
+    protected function collectFields(ObjectType $objectType,array $selectionSet = [],array $variableValues= [],array $visitedFragments = [])
+    {
+        $groupedFields = [];
+        foreach ($selectionSet as $selection)
+        {
+            if($selection->hasDirective('skip'))
+            {
+                continue;
+            }
+
+            if($selection->hasDirective('include') && $selection->getDirective('include') != true)
+            {
+                continue;
+            }
 
 
 
+            switch (true) {
+                case $selection instanceof Field:
+                    $groupedFields[$selection->getNameOrAlias()] = $selection->collectFields($objectType, $variableValues, $visitedFragments);
+                    break;
+                case $selection instanceof FragmentSpread:
+                    // If fragmentSpreadName is in visitedFragments, continue with the next selection in selectionSet
+                    if(isset($visitedFragments[$selection->getName()]))
+                    {
+                        break;
+                    }
+                    //Add fragmentSpreadName to visitedFragments
+                    array_push($visitedFragments,$selection->getName());
 
+
+                    $groupedFields[$selection->getName()];
+                    // @todo implement fragment spread
+                    break;
+                case $selection instanceof InlineFragment:
+                    // @todo implement inline fragment
+                    break;
+                default:
+                    break;
+            }
+        }
+        return $groupedFields;
     }
 
     protected function  CoerceVariableValues(Schema $schema, OperationDefinition $operation,$variableValues)
     {
+        $coercedValues = [];
+        $variableDefinitions = $operation->getVariableDefinitions();
+        foreach ($variableDefinitions as $definition)
+        {
+            // does this schema have a type
+            //dump($this->schema->getType($definition->name()));
+            if($this->schema->hasType($definition->type()->type()) && ($this->schema->getType($definition->type()->type()) instanceof InputType))
+            {
 
+               // if there is no variable set for this input
+                if(!array_key_exists($definition->name(),$variableValues)) {
+                    // there is also no default send an error
+                    if (!is_null($definition->defaultValue())) {
+                        $coercedValues[$definition->name()] = $definition->defaultValue();
+                        continue;
+                    }
+                    Throw new \Exception("query error");
+                }
+
+                if($definition->type()->isRequired() && is_null($variableValues[$definition->name()]))
+                {
+                    Throw new \Exception("query error");
+                }
+
+                $coercedValues[$definition->name()] = $variableValues[$definition->name()];
+
+            }
+
+        }
+        return $coercedValues;
     }
 
 

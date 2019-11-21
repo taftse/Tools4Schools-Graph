@@ -25,6 +25,11 @@ class Field extends Node implements NodeContract
         return isset($this->directives[$directive]);
     }
 
+    public function getDirective($directive)
+    {
+        return $this->directives[$directive];
+    }
+
     public function getNameOrAlias()
     {
         if(!is_null($this->alias))

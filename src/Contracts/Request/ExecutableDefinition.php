@@ -6,7 +6,7 @@
  * Time: 19:18
  */
 
-namespace Tools4Schools\Graph\Contracts\Language\Request\AST;
+namespace Tools4Schools\Graph\Contracts\Request;
 
 
 interface ExecutableDefinition

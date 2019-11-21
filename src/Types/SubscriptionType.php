@@ -4,7 +4,7 @@
 namespace Tools4Schools\Graph\Types;
 
 
-class InputType
+abstract class SubscriptionType extends ObjectType
 {
 
 }

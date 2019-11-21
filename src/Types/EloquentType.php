@@ -3,11 +3,15 @@
 
 namespace Tools4Schools\Graph;
 
+use Tools4Schools\Graph\Contracts\Schema\Types\ObjectType as ObjectTypeContract;
 
 use Illuminate\Database\Eloquent\Model;
+use Tools4Schools\Graph\Contracts\Schema\Types\Type;
 use Tools4Schools\Graph\Fields\RelationField;
 use Tools4Schools\Graph\Language\AST\Node;
 use Tools4Schools\Graph\Types\ListType;
+use Tools4Schools\Graph\Schema\Types\ObjectType;
+
 
 abstract class EloquentType extends ObjectType
 {
@@ -18,6 +22,7 @@ abstract class EloquentType extends ObjectType
      * @var Model
      */
     protected $query;
+
 
     /**
      * Get a fresh instance of the model represented by the resource.
@@ -32,29 +37,40 @@ abstract class EloquentType extends ObjectType
     }
 
 
-    public function resolve($node,BaseType $parent = null)
+
+
+    public function resolve(ObjectTypeContract $parent = null, array $arguments = [], $context = null, $info = null)
     {
-        //dump($node);
-        $this->query = static::newModel();
-
-        $this->resolveArguments($node);
-
-        $this->resolveFields($node);
-
-        if($this->type instanceof ListType)
+        if(!is_null($parent) && !is_null($parent->value))
         {
-            $this->value =  $this->query->get();
-            $result = [];
-
-                foreach($this->value as $value)
-                {
-                    $result[] = parent::resolve($node,$this);
-                }
-            return $result;
+            $this->value = $parent->value;
         }
-            $this->value =  $this->query->first();
 
-        return parent::resolve($node,$this);
+        if(is_null($this->value)) {
+
+            //dd($context['Eloquent']->addModel(static::model));
+
+            $this->query = static::newModel();
+
+            $this->resolveArguments($info);
+
+            $this->resolveFields($info);
+
+            if ($this->type instanceof ListType) {
+                $this->value = $this->query->get();
+
+                $result = [];
+
+                foreach ($this->value as $value) {
+                    $result[] = parent::resolve($this,[],$context,$info);
+                }
+                return $result;
+            }
+            $this->value = $this->query->first();
+
+        }
+
+        return parent::resolve($this,[],$context,$info);
     }
 
 
@@ -67,9 +83,10 @@ abstract class EloquentType extends ObjectType
                 if($type instanceof RelationField)
                 {
                     $this->query = $this->query->with($field->getName());
+                    //$this->query = $this->query->addSelect($field->getName());
                     continue;
                 }else {
-                    $this->query = $this->query->select($type->name());
+                    //$this->query = $this->query->addSelect($type->name());
                 }
             }else{
                 //@todo throw field not on type exception

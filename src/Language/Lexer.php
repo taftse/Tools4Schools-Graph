@@ -12,7 +12,7 @@ use Tools4Schools\Graph\Contracts\Language\Lexer as LexerContract;
 
 class Lexer implements LexerContract
 {
-    protected $text;
+    public $text;
 
     protected $length;
 
@@ -162,11 +162,30 @@ class Lexer implements LexerContract
     protected function readString():Token
     {
         $startPosition = $this->textPosition;
+        $value = '';
 
-        // check if the next 2 characters are also " if yes block string
+        if($this->text[$startPosition+1] == "\"" && $this->text[$startPosition+2] == "\"")
+        {
+            $this->textPosition = $startPosition+3;
 
-        throw new \Exception("This function has not been completed you lazy sod");
+            do
+                {
+                $value .= $this->text[$this->textPosition];
+                $this->textPosition++;
+            }while(!($this->text[$this->textPosition] == "\"" && $this->text[$this->textPosition+1] == "\"" && $this->text[$this->textPosition+2] == "\""));
+            $this->textPosition = $this->textPosition+3;
+            return new Token(SupportedTokens::BLOCK_STRING,$value,$startPosition);
+        }
 
+        $this->textPosition++;
+
+        do
+        {
+            $value .= $this->text[$this->textPosition];
+            $this->textPosition++;
+        }while($this->text[$this->textPosition] != "\"");
+        $this->textPosition++;
+        return new Token(SupportedTokens::STRING,$value,$startPosition);
     }
 
     protected function readInteger():Token

@@ -4,7 +4,7 @@
 namespace Tools4Schools\Graph\Contracts\Schema\Types;
 
 
-interface ScalarType extends Type
+interface ScalarType extends NamedType
 {
 
 }

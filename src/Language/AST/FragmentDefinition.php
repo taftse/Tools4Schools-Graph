@@ -9,7 +9,9 @@
 namespace Tools4Schools\Graph\Language\AST;
 
 
-class FragmentDefinition implements ExecutableDefinition
+use Tools4Schools\Graph\Contracts\Request\FragmentDefinition as FragmentDefinitionContract;
+
+class FragmentDefinition implements FragmentDefinitionContract
 {
     protected $name ='';
 
@@ -41,4 +43,6 @@ class FragmentDefinition implements ExecutableDefinition
     {
         return $this->name;
     }
+
+
 }

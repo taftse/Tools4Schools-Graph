@@ -10,12 +10,25 @@ namespace Tools4Schools\Graph\Contracts\Schema;
 
 
 use Tools4Schools\Graph\Contracts\Schema\Types\ObjectType;
+use Tools4Schools\Graph\Contracts\Schema\Types\OperationType;
 use Tools4Schools\Graph\Contracts\Schema\Types\Type;
 
 interface Schema
 {
 
+    /**
+     * returns the list of types supported by this Schema
+     *
+     * @return array
+     */
+    public function types():array;
 
+    /**
+     * returns the list of directives supported by this Schema
+     *
+     * @return array
+     */
+    public function directives():array;
 
     /**
      * Adds a Type to the schema
@@ -23,7 +36,7 @@ interface Schema
      * @param ObjectType $type
      * @throws \Exception
      */
-    public function addType(ObjectType $type):void;
+    public function addType(Type $type):void;
 
 
     /**
@@ -33,24 +46,6 @@ interface Schema
      * @throws \Exception
      */
     public function addTypes(array $types):void;
-
-
-    /**
-     * returns the root operation type
-     *
-     * @param $type
-     * @return ObjectType
-     */
-    public function getOperationType($typeName): OperationType;
-
-
-    /**
-     * Checks to see if the operation type exists as part of this schema
-     *
-     * @param string $typeName
-     * @return bool
-     */
-    public function hasOperationType(string $typeName):bool;
 
 
     /**
@@ -71,5 +66,39 @@ interface Schema
      */
     public function getType(string $typeName):Type;
 
+    /**
+     * Adds a Directive to the schema
+     *
+     * @param Directive $directive
+     * @throws \Exception
+     */
+    public function addDirective(Directive $directive):void;
 
+
+    /**
+     * Adds multiple directives to the schema
+     *
+     * @param array $directives
+     * @throws \Exception
+     */
+    public function addDirectives(array $directives):void;
+
+
+    /**
+     * Checks to see if the directive exists as part of this schema
+     *
+     * @param string $directiveName
+     * @return bool
+     */
+    public function hasDirective(string $directiveName):bool;
+
+
+    /**
+     * Gets the requested directive from the schema
+     *
+     * @param string $directiveName
+     * @return Directive
+     * @throws \Exception
+     */
+    public function getDirective(string $directiveName):Directive;
 }

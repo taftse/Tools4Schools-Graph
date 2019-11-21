@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Tools4Schools\Graph\Console\ResourceMakeCommand;
+use Tools4Schools\Graph\Resolvers\EloquentResolver;
 
 class GraphServiceProvider extends ServiceProvider
 {
@@ -68,6 +69,7 @@ class GraphServiceProvider extends ServiceProvider
          return new GraphServer();
      });
 
+        //$this->app['graphserver']->registerResolver(new EloquentResolver());
         $this->registerTypes();
         $this->registerQueries();
         $this->registerMutations();

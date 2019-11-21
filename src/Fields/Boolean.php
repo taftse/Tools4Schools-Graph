@@ -4,7 +4,9 @@
 namespace Tools4Schools\Graph\Fields;
 
 
-class Boolean
-{
+use Tools4Schools\Graph\Schema\Types\ScalarType;
 
+class Boolean extends ScalarType
+{
+    public $name = 'Boolean';
 }

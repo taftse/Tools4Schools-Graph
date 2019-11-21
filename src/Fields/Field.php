@@ -3,16 +3,17 @@ namespace Tools4Schools\Graph\Fields;
 
 
 
-use GraphQL\Type\Definition\Type as GraphqlType;
-use Tools4Schools\Graph\BaseType;
+
+use Tools4Schools\Graph\Schema\Types\Type as BaseType;
+use Tools4Schools\Graph\Contracts\Schema\Types\Type;
 use Tools4Schools\Graph\Types\ListType;
 
-abstract class Field extends BaseType
+abstract class Field extends BaseType implements Type
 {
 
     public function __construct(string $name,string $attribute = null,$resolveCallback = null)
     {
-        $this->name = $name;
+        parent::__construct($name);
     }
 
     protected function args():array

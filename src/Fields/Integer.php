@@ -4,12 +4,9 @@
 namespace Tools4Schools\Graph\Fields;
 
 
-use Tools4Schools\Graph\Types\ScalarType;
+use Tools4Schools\Graph\Schema\Types\ScalarType;
 
 class Integer extends ScalarType
 {
-    public function type()
-    {
-        return 'Int';
-    }
+    public $name = 'Int';
 }

@@ -5,16 +5,20 @@ namespace Tools4Schools\Graph\Language\AST;
 
 use Tools4Schools\Graph\Contracts\Language\Request\AST\ExecutableDefinition;
 use Tools4Schools\Graph\Contracts\Language\Request\AST\Node as NodeContract;
+use Tools4Schools\Graph\Contracts\Schema\Types\ObjectType;
+use Tools4Schools\Graph\Traits\HasName;
 
 abstract class Node implements NodeContract
 {
-    protected $name;
+    use HasName;
 
     protected $directives = [];
 
     protected $selectionSet = [];
 
-    public function collectFields(ExecutableDefinition $ObjectType,$variableValues,array $visitedFragments = []):array
+    protected $location;
+
+    public function collectFields(ObjectType $objectType,$variableValues,array $visitedFragments = []):array
     {
         $groupedFields = [];
 
@@ -32,19 +36,40 @@ abstract class Node implements NodeContract
 
                 switch (true) {
                     case $selection instanceof Field:
-                        $groupedFields[$selection->getNameOrAlias()] = $selection->collectFields($ObjectType, $variableValues, $visitedFragments);
+                        $groupedFields[$selection->getNameOrAlias()] = $selection->collectFields($objectType, $variableValues, $visitedFragments);
                         break;
                     case $selection instanceof FragmentSpread:
                         // If fragmentSpreadName is in visitedFragments, continue with the next selection in selectionSet
-                        if(isset($visitedFragments[$selection->getName()]))
+                        if(isset($visitedFragments[$selection->name()]))
                         {
                             break;
                         }
                         //Add fragmentSpreadName to visitedFragments
-                        array_push($visitedFragments,$selection->getName());
+                        array_push($visitedFragments,$selection->name());
+                        if(!$objectType->hasFragment($selection->name()))
+                        {
+                            break;
+                        }
+                        $fragment  = $objectType->getFragment($selection->name());
+
+                        if(!$this->doesFragmentTypeApply($ObjectType,$fragment->typeCondition()))
+                        {
+                            break;
+                        }
+
+                        $fragmentSelectionSet = $fragment->getSelectionSet();
+
+                        $fragmentGroupFieldsSet = $this->collectFields($ObjectType,$fragmentSelectionSet,$visitedFragments);
+
+                        $groupForResponseKey = [];
+
+                        foreach($fragmentGroupFieldsSet as $responseKey=>$fragmentGroup)
+                        {
+                            array_push($groupForResponseKey,$fragmentGroup);
+                        }
+                        $groupedFields[$responseKey] = $groupForResponseKey;
 
 
-                        $groupedFields[$selection->getName()];
                         // @todo implement fragment spread
                         break;
                     case $selection instanceof InlineFragment:
@@ -58,7 +83,7 @@ abstract class Node implements NodeContract
 
 
         return $groupedFields;
-    }
+    }*/
 
     /**
      * Gets the name of the node
@@ -67,7 +92,7 @@ abstract class Node implements NodeContract
      */
     public function getName(): string
     {
-        return $this->name;
+        return $this->name();
     }
 
     public function getSelectionSet()

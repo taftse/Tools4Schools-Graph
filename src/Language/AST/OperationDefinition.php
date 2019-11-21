@@ -9,21 +9,22 @@
 namespace Tools4Schools\Graph\Language\AST;
 
 
-use Tools4Schools\Graph\Contracts\Language\Request\AST\ExecutableDefinition;
+use Tools4Schools\Graph\Contracts\Request\OperationDefinition as OperationDefinitionContract ;
+use Tools4Schools\Graph\Traits\HasDirectives;
+use Tools4Schools\Graph\Traits\HasName;
 
 
-class OperationDefinition extends Node implements ExecutableDefinition
+class OperationDefinition extends Node implements OperationDefinitionContract
 {
-    protected $name ='';
+    use HasName,HasDirectives;
 
     protected $operation;
 
-    protected $variableDefinitions;
-
-    protected $directives;
+    protected $variableDefinitions =[];
 
 
-    public function __construct($operation,$name='',array $variableDefinitions = [],array $selectionSet = [],$directives = null)
+
+    public function __construct($operation,$name='',array $variableDefinitions = [],array $selectionSet = [],$directives = null,Location $location)
     {
         $this->name = $name;
         $this->operation = $operation;
@@ -43,5 +44,12 @@ class OperationDefinition extends Node implements ExecutableDefinition
     {
         return $this->operation;
     }
+
+    public function getVariableDefinitions()
+    {
+        return $this->variableDefinitions;
+    }
+
+
 
 }

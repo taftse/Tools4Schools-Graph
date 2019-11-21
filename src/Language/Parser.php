@@ -16,8 +16,17 @@ use Tools4Schools\Graph\Language\AST\Document;
 use Tools4Schools\Graph\Language\AST\FragmentDefinition;
 use Tools4Schools\Graph\Language\AST\FragmentSpread;
 use Tools4Schools\Graph\Language\AST\InlineFragment;
+use Tools4Schools\Graph\Language\AST\Location;
 use Tools4Schools\Graph\Language\AST\OperationDefinition;
 use Tools4Schools\Graph\Language\AST\Field;
+use Tools4Schools\Graph\Language\AST\Types\BooleanType;
+use Tools4Schools\Graph\Language\AST\Types\EnumType;
+use Tools4Schools\Graph\Language\AST\Types\IntType;
+use Tools4Schools\Graph\Language\AST\Types\ListType;
+use Tools4Schools\Graph\Language\AST\Types\NamedType;
+use Tools4Schools\Graph\Language\AST\Types\NonNullType;
+use Tools4Schools\Graph\Language\AST\Types\StringType;
+use Tools4Schools\Graph\Language\AST\VariableDefinition;
 
 class Parser implements ParserContract
 {
@@ -112,7 +121,7 @@ class Parser implements ParserContract
 
             // while the token is not equal to the end of file token
         do{
-            $document->addDirective($this->parseDefinition());
+            $document->addDefinition($this->parseDefinition());
         }
         while($this->lexer->current()->type() != SupportedTokens::EOF);
 
@@ -149,14 +158,16 @@ class Parser implements ParserContract
 
      protected function parseOperationDefinition()
      {
-
+         $start = $this->lexer->current();
          // is it a shorthand query ?
         if($this->isType(SupportedTokens::BRACE_L)){
             return new OperationDefinition(
                 'query',
                 '',
                 [],
-                $this->parseSelectionSet()
+                $this->parseSelectionSet(),
+                null,
+                $this->location($start)
             );
         }
 
@@ -174,36 +185,34 @@ class Parser implements ParserContract
 
             $name,
             $this->parseVariableDefinitions(),
-            $this->parseSelectionSet()// selection sets
-
-        /*
-        'variableDefinitions' => $this->parseVariableDefinitions(),
-            'directives'          => $this->parseDirectives(false),
-            'selectionSet'        => $this->parseSelectionSet(),
-            'loc'                 => $this->loc($start),
-        */
+            $this->parseSelectionSet(),// selection sets
+            null,
+            $this->location($start)
 
         );
      }
 
      protected function parseFragmentDefinition()
      {
-        $this->expectedValue('fragment');
+         $start = $this->lexer->current();
 
-        $name = $this->parseName();
+         $this->expectedValue('fragment');
 
-        $this->expectedValue('on');
+         $name = $this->parseName();
 
-        $typeCondition = $this->parseName();
+         $this->expectedValue('on');
 
-        return new FragmentDefinition(
-            $name,
-            $typeCondition,
-           // $this->parseDirectives(),
-            [],
-            $this->parseSelectionSet()
-        );
-        throw new \Exception('NotImplementedException');
+         $typeCondition = $this->parseNamedType();
+
+         return new FragmentDefinition(
+             $name,
+             $typeCondition,
+             // $this->parseDirectives(),
+             [],
+             $this->parseSelectionSet(),
+             $this->location($start)
+         );
+         throw new \Exception('NotImplementedException');
      }
 
      protected function parseOperationType()
@@ -235,11 +244,13 @@ class Parser implements ParserContract
          // has the text got attributes
          if($this->isType(SupportedTokens::PAREN_L))
          {
+             $this->lexer->advance();
              // while we dont have a closing bracket ) parse each of the variables
             while($this->lexer->current()->type() != SupportedTokens::PAREN_R)
             {
                 $arguments[] = $this->parseVariableDefinition();
             }
+            $this->lexer->advance();
          }
          return $arguments;
      }
@@ -360,8 +371,25 @@ class Parser implements ParserContract
 
      protected function parseBoolean()
      {
+         $start = $this->lexer->current();
          $this->lexer->advance();
-        return $this->lexer->current()->value() === "true";
+         return new BooleanType($this->lexer->current()->value() === "true", $this->location($start));
+     }
+
+     protected function parseEnum()
+     {
+         $start = $this->lexer->current();
+         $value = $start->value();
+         $this->lexer->advance();
+         return new EnumType($value,$this->location($start));
+     }
+
+     protected function parseString()
+     {
+         $start = $this->lexer->current();
+         $value = $start->value();
+         $this->lexer->advance();
+         return new StringType($value,$this->location($start));
      }
 
      protected function parseFragment()
@@ -397,21 +425,71 @@ class Parser implements ParserContract
 
      protected function parseVariableDefinition()
      {
+        $start = $this->lexer->current();
+
         $variable = $this->parseVariable();
+
         $this->expectedType(SupportedTokens::COLON);
         $type = $this->parseTypeReference();
+
+        $default = null;
+        if($this->isType(SupportedTokens::EQUALS))
+        {
+            $this->lexer->advance();
+            $default = $this->parseValue();
+        }
+
+        return new VariableDefinition($variable,$type,$default,$this->location($start));
      }
 
      protected function parseVariable()
      {
-        $this->lexer->expects(SupportedTokens::DOLLAR);
+        $this->expectedType(SupportedTokens::DOLLAR);
         return $this->parseName();
      }
 
      protected function parseInt()
      {
-         $value = $this->lexer->current()->value();
+         $start = $this->lexer->current();
+         $value = $start->value();
          $this->lexer->advance();
-         return $value;
+         return new IntType($value,$this->location($start));
+     }
+
+     protected function parseTypeReference()
+     {
+         $start = $this->lexer->current();
+
+         if($this->isType(SupportedTokens::BRACKET_L))
+         {
+             $type = $this->parseTypeReference();
+             $this->expectedType(SupportedTokens::BRACKET_L);
+             $type = new ListType($type,$this->location($start));
+         }else{
+            $type = $this->parseNamedType();
+         }
+
+         if($this->isType(SupportedTokens::BANG))
+         {
+             $this->lexer->advance();
+             return $type->required();//new NonNullType($type,$this->location($start));
+         }
+            return $type;
+     }
+
+     protected function parseNamedType()
+     {
+         $start = $this->lexer->current();
+         return new NamedType($this->parseName(),$this->location($start));
+     }
+
+     protected function location(Token $startToken)
+     {
+        return new Location($startToken,$this->lexer->previous(),$this->lexer->text);
+     }
+
+     protected function unexpectedException()
+     {
+        dd($this->lexer->current());
      }
 }

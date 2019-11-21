@@ -6,7 +6,7 @@ namespace Tools4Schools\Graph\Contracts\Schema\Types;
 
 interface Type
 {
-    public function name();
+
 
     /**
      * resolve the requested fields for this type
@@ -17,8 +17,13 @@ interface Type
      * @param null $info the AST of the request
      * @return mixed
      */
-    public function resolve(Type $parent = null,array $arguments = [],$context  = null,$info = null);
+    public function resolve(ObjectType $parent = null,array $arguments = [],$context  = null,$info = null);
+
 
    // public function toString():string ;
+
+    //public function resolveIntrospection();
+
+    public function kind():Type;
 
 }

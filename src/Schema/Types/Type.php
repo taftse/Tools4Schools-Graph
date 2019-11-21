@@ -1,13 +1,11 @@
 <?php
 
 
-namespace Tools4Schools\Graph;
+namespace Tools4Schools\Graph\Schema\Types;
 
+use Tools4Schools\Graph\Contracts\Schema\Types\Type as TypeContract;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\ScalarType;
-
-abstract class BaseType
+abstract class Type implements TypeContract
 {
     /**
      * The name of the element.
@@ -38,16 +36,25 @@ abstract class BaseType
     public $deprecated = false;
 
     /**
+     * what is the deprecation reason
+     *
+     * @var bool
+     */
+    public $depricatedReason = '';
+
+    /**
      * the resolved value of this type
      *
      * @var
      */
     public $value;
 
-
-    public function __construct(string $name = '')
+    public function __construct(string $name = null)
     {
-        $this->name = $name;
+        if(!is_null($name))
+        {
+            $this->name = $name;
+        }
         return $this;
     }
 
@@ -61,6 +68,7 @@ abstract class BaseType
 
         return (new \ReflectionClass($this))->getShortName();
     }
+
 
     /**
      * Create a new GraphElement.
@@ -88,12 +96,21 @@ abstract class BaseType
      *
      * @return $this
      */
-    public function deprecated()
+    public function deprecated(string $reason = '')
     {
         $this->deprecated = true;
+        $this->depricatedReason = $reason;
         return $this;
     }
 
-
-    abstract public function resolve($selectionSet,BaseType $parent = null);
+    public function toArray()
+    {
+        $result['kind'] = $this->type();
+        $result['name'] = $this->name();
+        $result['description'] = $this->description;
+        $result['required'] = $this->required;
+        $result['deprecated'] = $this->deprecated;
+        $result['deprecatedReason'] = $this->depricatedReason;
+        return $result;
+    }
 }

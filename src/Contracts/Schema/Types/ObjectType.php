@@ -4,7 +4,7 @@
 namespace Tools4Schools\Graph\Contracts\Schema\Types;
 
 
-interface ObjectType extends Type
+interface ObjectType extends NamedType
 {
     /**
      * Returns all the fields that are part of this Type
