@@ -11,6 +11,7 @@
   "require": {
     "php": "^7.2",
     "illuminate/support": "^6.0",
+    "react/promise": "2.7.1",
     "symfony/finder": "^4.0"
   },
   "require-dev": {

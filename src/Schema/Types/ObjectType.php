@@ -8,15 +8,18 @@ use Tools4Schools\Graph\Contracts\Schema\Types\Type;
 
 use Tools4Schools\Graph\Contracts\Types\OutputType;
 use Tools4Schools\Graph\Schema\Types\Type as BaseType;
+use Tools4Schools\Graph\Traits\HasFields;
 
 abstract class ObjectType extends BaseType implements ObjectTypeContract, OutputType
 {
+    use HasFields;
+
     public function kind():Type
     {
         return ObjectTypeContract;
     }
 
-    public function resolve(ObjectTypeContract $parent = null, array $arguments = [], $context = null, $info = null)
+    /*public function resolve(ObjectTypeContract $parent = null, array $arguments = [], $context = null, $info = null)
     {
         $result =[];
 
@@ -28,31 +31,16 @@ abstract class ObjectType extends BaseType implements ObjectTypeContract, Output
         }
 
         return $result;
-    }
+    }*/
 
-    public function hasField(string $fieldName):bool
+    protected function resolver(ObjectTypeContract $parent = null, array $arguments = [], $context = null, $info = null)
     {
-        foreach ($this->fields() as $field) {
-            if($field->name() == $fieldName)
-            {
-                return true;
-            }
-        }
-        return false;
+        dd($parent);
     }
 
-    public function getField(string $fieldName):Type
-    {
-        foreach ($this->fields() as $field) {
-            if($field->name() == $fieldName)
-            {
-                return $field;
-            }
-        }
-    }
 
-    public function executeField(ObjectTypeContract $type,$value,$fieldType,$vatiableValue)
+   /* public function executeField(ObjectTypeContract $type,$value,$fieldType,$vatiableValue)
     {
 
-    }
+    }*/
 }

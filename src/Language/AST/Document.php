@@ -62,18 +62,18 @@ class Document implements DocumentContract
     {
         if( $operation instanceof OperationDefinition)
         {
-            if($operation->getName() =='')
+            if($operation->name() =='')
             {
                 $this->operations[] = $operation;
             }else{
-                $this->operations[$operation->getName()]= $operation;
+                $this->operations[$operation->name()]= $operation;
             }
         }else if($operation instanceof FragmentDefinition){
-            if($operation->getName() =='')
+            if($operation->name() =='')
             {
                 $this->fragments[] = $operation;
             }else{
-                $this->fragments[$operation->getName()]= $operation;
+                $this->fragments[$operation->name()]= $operation;
             }
         }
 

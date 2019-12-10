@@ -6,18 +6,20 @@ namespace Tools4Schools\Graph\Language\AST;
 use Tools4Schools\Graph\Contracts\Language\Request\AST\ExecutableDefinition;
 use Tools4Schools\Graph\Contracts\Language\Request\AST\Node as NodeContract;
 use Tools4Schools\Graph\Contracts\Schema\Types\ObjectType;
+use Tools4Schools\Graph\Traits\HasDirectives;
 use Tools4Schools\Graph\Traits\HasName;
+use Tools4Schools\Graph\Traits\HasSelectionSet;
 
 abstract class Node implements NodeContract
 {
-    use HasName;
+    use HasName,HasSelectionSet,HasDirectives;
 
-    protected $directives = [];
+   // protected $directives = [];
 
-    protected $selectionSet = [];
+
 
     protected $location;
-
+/*
     public function collectFields(ObjectType $objectType,$variableValues,array $visitedFragments = []):array
     {
         $groupedFields = [];
@@ -83,21 +85,17 @@ abstract class Node implements NodeContract
 
 
         return $groupedFields;
-    }*/
+    }//*/
 
     /**
      * Gets the name of the node
      *
      * @return string
      */
-    public function getName(): string
+   /* public function getName(): string
     {
         return $this->name();
-    }
+    }*/
 
-    public function getSelectionSet()
-    {
-        return $this->selectionSet;
-    }
 
 }

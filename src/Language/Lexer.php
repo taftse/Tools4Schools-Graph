@@ -112,16 +112,16 @@ class Lexer implements LexerContract
 
             return new Token($this->text[$textPosition],$this->text[$textPosition],$textPosition);
         }
-
-        // is the next token text
-        if(preg_match('/[_A-Za-z][_0-9A-Za-z]*/',$this->text[$textPosition]))
-        {
-            return $this->readName();
-        }
-
+        // is the next character a integer?
         if(preg_match('/[-,0-9]/',$this->text[$textPosition]))
         {
             return $this->readInteger();
+        }
+
+        // is the next token text?
+        if(preg_match('/[_0-9A-Za-z]/',$this->text[$textPosition]))
+        {
+            return $this->readName();
         }
 
         if($this->text[$textPosition] == "\"")
@@ -129,7 +129,7 @@ class Lexer implements LexerContract
             return $this->readString();
         }
 
-        // if the next character a integer
+
 
        // $this->textPosition ++;
         //throw new \Exception($this->text[$textPosition]);
@@ -153,7 +153,7 @@ class Lexer implements LexerContract
         {
             $value .= $this->text[$this->textPosition];
             $this->textPosition++;
-        }while(preg_match('/[_A-Za-z][_0-9A-Za-z]*/',$this->text[$this->textPosition]));
+        }while(preg_match('/[_0-9A-Za-z]/',$this->text[$this->textPosition]));
 
         return new Token(SupportedTokens::NAME,$value,$startPosition);
     }

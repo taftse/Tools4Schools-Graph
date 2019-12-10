@@ -25,9 +25,10 @@ interface ObjectType extends NamedType
      * Returns the requested field
      *
      * @param string $fieldName
-     * @return Type
+     * @param string $throwError = false
+     * @return Null|Type
      * @throws FieldNotFoundException
      */
-    public function getField(string $fieldName):Type;
+    public function getField(string $fieldName,bool $throwError):?Type;
 
 }

@@ -101,4 +101,25 @@ interface Schema
      * @throws \Exception
      */
     public function getDirective(string $directiveName):Directive;
+
+    /**
+     * Returns the RootQueryType
+     *
+     * @return ObjectType
+     */
+    public function getQueryType():ObjectType;
+
+    /**
+     * Returns the rootMigrationType
+     *
+     * @return ObjectType
+     */
+    public function getMutationType():ObjectType;
+
+    /**
+     * Returns the rootSubscriptionType
+     *
+     * @return ObjectType
+     */
+    public function getSubscriptionType():ObjectType;
 }

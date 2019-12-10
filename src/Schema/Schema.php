@@ -3,7 +3,6 @@
 namespace Tools4Schools\Graph\Schema;
 
 
-use PhpParser\Node\Scalar\MagicConst\Dir;
 use Tools4Schools\Graph\Contracts\Schema\Directive;
 use Tools4Schools\Graph\Contracts\Schema\Types\Type;
 use Tools4Schools\Graph\Contracts\Schema\Types\Query;
@@ -14,17 +13,19 @@ use Tools4Schools\Graph\Contracts\Schema\Types\OperationType;
 use Tools4Schools\Graph\Contracts\Schema\Schema as SchemaContract;
 
 
-use Tools4Schools\Graph\Introspection\Schema as IntrospectionSchema;
+use Tools4Schools\Graph\Exceptions\ExecutionException;
+use Tools4Schools\Graph\Execution\Executor;
 use Tools4Schools\Graph\Schema\Types\ListType;
-use Tools4Schools\Graph\Schema\Types\NamedListType;
 use Tools4Schools\Graph\Types\IntrospectionType;
+use Tools4Schools\Graph\Schema\Types\NamedListType;
 use Tools4Schools\Graph\Schema\Types\OperationType as Operation;
+use Tools4Schools\Graph\Introspection\Schema as IntrospectionSchema;
 
 use Tools4Schools\Graph\Fields\ID;
 use Tools4Schools\Graph\Fields\Text;
+use Tools4Schools\Graph\Fields\Number;
 use Tools4Schools\Graph\Fields\Boolean;
 use Tools4Schools\Graph\Fields\Integer;
-use Tools4Schools\Graph\Fields\Number;
 
 
 class Schema implements SchemaContract
@@ -49,11 +50,11 @@ class Schema implements SchemaContract
     {
             //$this->types = new NamedListType(Type::class);
             $this->types['Query'] = Operation::make('Query')->required();
-            $this->types['Mutation']= Operation::make('Mutation');
-            $this->types['Subscription'] = Operation::make('Subscription');
+            //$this->types['Mutation']= Operation::make('Mutation');
+            //$this->types['Subscription'] = Operation::make('Subscription');
 
             // if introspection is enabled add the schema query
-            $this->addType($this->introspection());
+            //$this->addType($this->introspection());
 
             $this->addType(ID::make());
             $this->addType(Text::make('String'));
@@ -73,12 +74,20 @@ class Schema implements SchemaContract
     public function addType(Type $type):void
     {
         if ($type instanceof Mutation) {
+            if(!$this->hasType('Mutation'))
+            {
+                $this->types['Mutation']= Operation::make('Mutation');
+            }
             $this->types['Mutation']->addOperation($type);
            // $this->types->getItem('mutation')->addOperation($type);
         } else if ($type instanceof Query) {
             $this->types['Query']->addOperation($type);
             //$this->types->getItem('query')->addOperation($type);
         } else if ($type instanceof Subscription) {
+            if(!$this->hasType('Subscription'))
+            {
+                $this->types['Subscription']= Operation::make('Subscription');
+            }
             $this->types['Subscription']->addOperation($type);
             //$this->types->getItem('subscription')->addOperation($type);
         } else if ($type instanceof Type) {
@@ -223,8 +232,41 @@ class Schema implements SchemaContract
 
     }*/
 
-   protected function introspection():OperationType
+   /*protected function introspection():OperationType
    {
        return new IntrospectionSchema($this);
    }//*/
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getQueryType(): ObjectType
+    {
+        return $this->getType('Query');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMutationType(): ObjectType
+    {
+        if(!$this->hasType('Mutation'))
+        {
+            throw new ExecutionException('This schema does not support mutations');
+        }
+        return $this->getType('Mutation');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSubscriptionType(): ObjectType
+    {
+        if(!$this->hasType('Subscription'))
+        {
+            throw new ExecutionException('This schema does not support subscriptions');
+        }
+        return $this->getType('Subscription');
+    }
 }

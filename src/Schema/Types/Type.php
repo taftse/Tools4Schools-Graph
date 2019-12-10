@@ -4,9 +4,12 @@
 namespace Tools4Schools\Graph\Schema\Types;
 
 use Tools4Schools\Graph\Contracts\Schema\Types\Type as TypeContract;
+use Tools4Schools\Graph\Traits\HasResolver;
+use Tools4Schools\Graph\Traits\HasValue;
 
 abstract class Type implements TypeContract
 {
+    use HasResolver,HasValue;
     /**
      * The name of the element.
      *
@@ -42,12 +45,7 @@ abstract class Type implements TypeContract
      */
     public $depricatedReason = '';
 
-    /**
-     * the resolved value of this type
-     *
-     * @var
-     */
-    public $value;
+
 
     public function __construct(string $name = null)
     {
@@ -94,9 +92,10 @@ abstract class Type implements TypeContract
     /**
      * Marks this as a required imput
      *
+     * @param string $reason
      * @return $this
      */
-    public function deprecated(string $reason = '')
+    public function deprecated(string $reason)
     {
         $this->deprecated = true;
         $this->depricatedReason = $reason;

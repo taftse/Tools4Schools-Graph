@@ -17,7 +17,8 @@ interface Type
      * @param null $info the AST of the request
      * @return mixed
      */
-    public function resolve(ObjectType $parent = null,array $arguments = [],$context  = null,$info = null);
+    //public function resolve(ObjectType $parent = null,array $arguments = [],$context  = null,$info = null);
+    public function resolve(...$arguments);
 
 
    // public function toString():string ;

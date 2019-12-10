@@ -12,11 +12,12 @@ namespace Tools4Schools\Graph\Language\AST;
 use Tools4Schools\Graph\Contracts\Request\OperationDefinition as OperationDefinitionContract ;
 use Tools4Schools\Graph\Traits\HasDirectives;
 use Tools4Schools\Graph\Traits\HasName;
+use Tools4Schools\Graph\Traits\HasSelectionSet;
 
 
 class OperationDefinition extends Node implements OperationDefinitionContract
 {
-    use HasName,HasDirectives;
+    use HasName,HasDirectives,HasSelectionSet;
 
     protected $operation;
 

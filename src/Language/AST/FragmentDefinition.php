@@ -10,16 +10,18 @@ namespace Tools4Schools\Graph\Language\AST;
 
 
 use Tools4Schools\Graph\Contracts\Request\FragmentDefinition as FragmentDefinitionContract;
+use Tools4Schools\Graph\Language\AST\Types\Type;
+use Tools4Schools\Graph\Traits\HasDirectives;
+use Tools4Schools\Graph\Traits\HasName;
+use Tools4Schools\Graph\Traits\HasSelectionSet;
 
 class FragmentDefinition implements FragmentDefinitionContract
 {
-    protected $name ='';
+    use HasName,HasDirectives,HasSelectionSet;
+
 
     protected $typeCondition;
 
-    protected $directives;
-
-    protected $selectionSet;
 
     /**
      * FragmentDefinition constructor.
@@ -36,13 +38,11 @@ class FragmentDefinition implements FragmentDefinitionContract
         $this->selectionSet = $selectionSet;
     }
 
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
 
+
+    public function typeCondition():Type
+    {
+        return $this->typeCondition;
+    }
 
 }

@@ -11,5 +11,7 @@ namespace Tools4Schools\Graph\Contracts\Request;
 
 interface ExecutableDefinition
 {
-    public function getName(): string;
+    public function name(): string;
+
+    public function getSelectionSet(): array;
 }

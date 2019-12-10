@@ -75,7 +75,7 @@ class Parser implements ParserContract
             $this->lexer->advance();
             return $token;
         }
-        //dump($this->lexer);
+        dd($this->lexer);
         // throw error Expected TokenType but found current token type
         throw new \Exception('Expected '.$tokenType.' but found '.$token->type(). ' token no '.(count($this->lexer->tokens) -2 ) .' Character no '.$token->position());
     }

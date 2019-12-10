@@ -4,7 +4,7 @@
 namespace Tools4Schools\Graph\Contracts\Schema\Types;
 
 
-interface NamedType
+interface AbstractType extends NamedType
 {
-    public function name();
+
 }

@@ -4,6 +4,7 @@ namespace Tools4Schools\Graph\Language\AST;
 
 use Tools4Schools\Graph\Contracts\Language\Request\AST\Node as NodeContract;
 
+
 class Field extends Node implements NodeContract
 {
     protected $alias = null;
@@ -17,17 +18,6 @@ class Field extends Node implements NodeContract
         $this->arguments = $arguments;
         $this->directives = $directives;
         $this->selectionSet = $selectionSet;
-    }
-
-
-    public function hasDirective($directive)
-    {
-        return isset($this->directives[$directive]);
-    }
-
-    public function getDirective($directive)
-    {
-        return $this->directives[$directive];
     }
 
     public function getNameOrAlias()

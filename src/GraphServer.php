@@ -12,6 +12,7 @@ use ReflectionClass;
 use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
 use Tools4Schools\Graph\Exceptions\TypeNotFoundException;
+use Tools4Schools\Graph\Execution\Executor;
 use Tools4Schools\Graph\Language\AST\Field;
 use Tools4Schools\Graph\Language\AST\FragmentDefinition;
 use Tools4Schools\Graph\Language\AST\FragmentSpread;
@@ -23,6 +24,7 @@ use Tools4Schools\Graph\Language\Parser;
 use Tools4Schools\Graph\Language\AST\Document;
 use Tools4Schools\Graph\Schema\Schema;
 use Tools4Schools\Graph\Schema\Types\ObjectType;
+use Tools4Schools\Graph\Support\FieldCollector;
 
 //use Tools4Schools\Graph\Schema\Types\Type;
 
@@ -60,6 +62,8 @@ class GraphServer
         return '0.1';
     }
 
+
+    public $fieldCollector;
 
     public function __construct()
     {
@@ -136,13 +140,14 @@ class GraphServer
 
         $parser = new Parser(new Lexer());
         $this->requestDocument = $parser->parse($query);
+        //$this->fieldCollector = new FieldCollector($this->schema,$this->requestDocument);
 
-        return $this->executeRequest($this->requestDocument,$operationName,$variableValue);
+        return (new Executor($this->schema))->execute($this->requestDocument,$operationName,$variableValue);//$this->executeRequest($this->requestDocument,$operationName,$variableValue);
     }
 
 
 
-
+/*
     protected function executeRequest(Document $requestDocument,string $operationName = null,$variableValues = null,$initialValue = null)
     {
         $operation = $requestDocument->getOperation($operationName);
@@ -159,7 +164,7 @@ class GraphServer
             default:
                 throw new \Exception("unsupported operation");
         }
-    }
+    }*/
 
     protected function executeQuery(OperationDefinition $query,  $variableValues = null, $initialValue = null)
     {
@@ -169,10 +174,10 @@ class GraphServer
 
 
 
-        $data = $this->executeSelectionSet($selectionSet,$queryType,$initialValue,$variableValues);
+        [$data,$errors] = $this->executeSelectionSet($selectionSet,$queryType,$initialValue,$variableValues);
 
 
-
+       // dump($data);
 
         // check that the query type exists on the schema
        // dump($this->schema->getType('query')->hasField('__schema'));
@@ -212,22 +217,27 @@ class GraphServer
     {
 
         //dd($selectionSet->collectFields($objectType,$selectionSet,$variableValues));
-        $groupedFieldSet = $objectType->collectFields($this->request,$selectionSet,$variableValues);
+        $groupedFieldSet = $this->fieldCollector->collectFields($objectType,$selectionSet,$variableValues);//$objectType->collectFields($this->request,$selectionSet,$variableValues);
        // $groupedFieldSet = $this->collectFields($objectType,$selectionSet,$variableValues);
-
+        //dd($groupedFieldSet);
 
 
         $result = [];
+        //dump();
         foreach($groupedFieldSet as $responseKey => $fields)
         {
-            $fieldName = $field->name();
-            $fieldType = $field->type();
-            if($this->schema->hasType($fieldType))
+            dump($fields);
+            $fieldName = $fields[0]->name();
+            //$fieldType = $fields->type();
+            dump($fieldName);
+            if($objectType->hasField($fieldName))
             {
-                $responseValue = ExecuteField($objectType,$objectValue,$fields,$fieldType,$variableValues);
+                $responseValue = ExecuteField($objectType,$objectValue,$fields,$this->schema->getType($fieldName),$variableValues);
                 $result[$responseKey] = $responseValue;
-            }
+            }//*/
         }
+
+       dd($result);
         return $result;
 
     }
@@ -276,7 +286,7 @@ class GraphServer
         return $groupedFields;
     }
 
-    protected function  CoerceVariableValues(Schema $schema, OperationDefinition $operation,$variableValues)
+    /*protected function  CoerceVariableValues(Schema $schema, OperationDefinition $operation,$variableValues)
     {
         $coercedValues = [];
         $variableDefinitions = $operation->getVariableDefinitions();
@@ -309,6 +319,6 @@ class GraphServer
         }
         return $coercedValues;
     }
-
+*/
 
 }

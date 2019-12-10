@@ -19,8 +19,30 @@ abstract class ScalarType extends BaseType implements ScalarTypeContract, InputT
         return ScalarTypeContract;
     }
 
-    public function resolve(ObjectType $parent = null, array $arguments = [], $context = null, $info = null)
+    protected function resolver(ObjectType $parent = null, array $arguments = [], $context = null, $info = null)
     {
-        return $parent->value->{$this->name};
+
+        // has this Type got a value?
+        if(!is_null($this->value))
+        {
+            // yep lets return it
+            return $this->value();
+        }
+
+        // has the parent type got a value?
+        if(!is_null($parent->value())) {
+            // yep but is it an array ? and has it got a value for this type ?
+            if (is_array($parent->value()) && isset($parent->value()[$this->name()])) {
+                // yep lets return it
+                return $parent->value()[$this->name()];
+            }
+            // nope its an object but does it have a value for this type?
+            if(isset($parent->value()->{$this->name()})) {
+                // yep lets return it
+                return $parent->value()->{$this->name()};
+            }
+        }
+        // nope this type cannot be resolved to a value return null
+        return null;
     }
 }
