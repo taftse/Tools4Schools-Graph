@@ -47,7 +47,7 @@ class FieldCollector
 
             switch (true) {
                 case $selection instanceof Field:
-                    $groupedFields[$selection->getNameOrAlias()][] = $selection;
+                    $groupedFields[$selection->getNameOrAlias()] = $selection;
                     break;
                 case $selection instanceof FragmentSpread:
 
@@ -89,12 +89,20 @@ class FieldCollector
 
                     $groupForResponseKey = [];
 
-                    foreach($fragmentGroupFieldsSet as $fragmentGroup)
+                    foreach($fragmentGroupFieldsSet as $responseKey=>$fragmentGroup)
                     {
-                        array_push($groupForResponseKey,$fragmentGroup);
+                        //dd($fragmentGroup);
+                       // array_push($groupForResponseKey,$fragmentGroup);
+                        //$groupedFields[$responseKey][] = $fragmentGroup;
+                        if(isset($groupedFields[$responseKey]) && $groupedFields[$responseKey] instanceof Field)
+                        {
+                            $groupedFields[$responseKey]->addField($fragmentGroup->getSelectionSet());
+                        }else{
+                            $groupedFields[$responseKey] = $fragmentGroup;
+                        }
                     }
+                    //$groupedFields[$selection->name()][] = $groupForResponseKey;
 
-                    $groupedFields[$selection->name()][] = $groupForResponseKey;
                     break;
                 case $selection instanceof InlineFragment:
                     if(!is_null($selection->typeCondition()) && !$this->doesFragmentTypeApply($objectType,$fragment->typeCondition()))

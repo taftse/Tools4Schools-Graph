@@ -64,7 +64,7 @@ abstract class AbstractExecutor
     {
 
         // to comply with the specification
-        $field = $field[0];
+        //$field = $field[0];
 
         if(is_array($field))
         {
@@ -78,7 +78,7 @@ abstract class AbstractExecutor
         {
             throw new UndefinedFieldException($field->name());
         }
-        dump($fieldDefinition);
+       // dump($fieldDefinition);
        // determineResolveCallback($field,$parentType)
 
         dd($fieldDefinition->resolve());
