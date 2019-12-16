@@ -12,6 +12,7 @@ use Tools4Schools\Graph\Contracts\Types\UnionType;
 //use Tools4Schools\Graph\Fields\Field;
 use Tools4Schools\Graph\Language\AST\Field;
 use Tools4Schools\Graph\Language\AST\FragmentSpread;
+use Tools4Schools\Graph\Language\AST\SelectionSet;
 use Tools4Schools\Graph\Schema\Schema;
 use Tools4Schools\Graph\Schema\Types\InterfaceType;
 
@@ -27,11 +28,11 @@ class FieldCollector
        $this->schema = $schema;
    }
 
-    public function collectFields(ObjectType $objectType,array $selectionSet = [],array $variableValues= [],array $visitedFragments = [])
+    public function collectFields(ObjectType $objectType,SelectionSet $selectionSet,array $variableValues= [],array $visitedFragments = [])
     {
         $groupedFields = [];
 
-        foreach ($selectionSet as $selection)
+        foreach ($selectionSet->toArray() as $selection)
         {
 
             // @todo change how to execute directives
@@ -96,7 +97,8 @@ class FieldCollector
                         //$groupedFields[$responseKey][] = $fragmentGroup;
                         if(isset($groupedFields[$responseKey]) && $groupedFields[$responseKey] instanceof Field)
                         {
-                            $groupedFields[$responseKey]->addField($fragmentGroup->getSelectionSet());
+                           // dd($fragmentGroup->getSelectionSet());
+                            $groupedFields[$responseKey]->mergeSelectionSets($fragmentGroup->getSelectionSet());
                         }else{
                             $groupedFields[$responseKey] = $fragmentGroup;
                         }

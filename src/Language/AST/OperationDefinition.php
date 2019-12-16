@@ -9,6 +9,7 @@
 namespace Tools4Schools\Graph\Language\AST;
 
 
+
 use Tools4Schools\Graph\Contracts\Request\OperationDefinition as OperationDefinitionContract ;
 use Tools4Schools\Graph\Traits\HasDirectives;
 use Tools4Schools\Graph\Traits\HasName;
@@ -25,7 +26,7 @@ class OperationDefinition extends Node implements OperationDefinitionContract
 
 
 
-    public function __construct($operation,$name='',array $variableDefinitions = [],array $selectionSet = [],$directives = null,Location $location)
+    public function __construct($operation,$name='',array $variableDefinitions = [],SelectionSet $selectionSet,$directives = null,Location $location)
     {
         $this->name = $name;
         $this->operation = $operation;

@@ -19,6 +19,7 @@ use Tools4Schools\Graph\Language\AST\InlineFragment;
 use Tools4Schools\Graph\Language\AST\Location;
 use Tools4Schools\Graph\Language\AST\OperationDefinition;
 use Tools4Schools\Graph\Language\AST\Field;
+use Tools4Schools\Graph\Language\AST\SelectionSet;
 use Tools4Schools\Graph\Language\AST\Types\BooleanType;
 use Tools4Schools\Graph\Language\AST\Types\EnumType;
 use Tools4Schools\Graph\Language\AST\Types\IntType;
@@ -255,7 +256,7 @@ class Parser implements ParserContract
          return $arguments;
      }
 
-     protected function parseSelectionSet()
+    /* protected function parseSelectionSet()
      {
          $selections = [];
          if($this->expectedType(SupportedTokens::BRACE_L))
@@ -269,7 +270,22 @@ class Parser implements ParserContract
          $this->lexer->advance();
          return $selections;
 
-     }
+     }*/
+
+        protected function parseSelectionSet():SelectionSet
+        {
+            $selections = new SelectionSet();
+            if($this->expectedType(SupportedTokens::BRACE_L))
+            {
+                // while we dont have a closing brace } parse each of the variables
+                do
+                {
+                    $selections->addField($this->parseSelection());
+                }while($this->lexer->current()->type() != SupportedTokens::BRACE_R);
+            }
+            $this->lexer->advance();
+            return $selections;
+        }
 
 
      protected function parseSelection()

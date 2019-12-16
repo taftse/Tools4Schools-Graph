@@ -30,7 +30,7 @@ class FragmentDefinition implements FragmentDefinitionContract
      * @param array $directives
      * @param array $selectionSet
      */
-    public function __construct($name,$typeCondition,array $directives = [],array $selectionSet = [])
+    public function __construct($name,$typeCondition,array $directives = [],SelectionSet $selectionSet)
     {
         $this->name = $name;
         $this->typeCondition = $typeCondition;
